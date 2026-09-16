@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="#eef1f5">
+    <title>鸿蒙智行 · HarmonyOS 7 适配预览</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="./reference.css">
+    <link rel="stylesheet" href="./os7.css">
+    <link rel="stylesheet" href="./os7-top.css">
+  </head>
+  <body class="os7-preview" data-theme="light" data-light="balanced" data-grip="both" data-motion="full">
+    <main class="demo-shell">
+      <aside class="demo-guide" aria-label="适配预览设置">
+        <div class="preview-heading"><p class="eyebrow">HIMA · HARMONYOS 7</p><a id="referenceLink" href="./index.html">查看原版 ↗</a></div>
+        <h1>熟悉的智行<br>更自然的交互</h1>
+        <p class="guide-copy">向上滑动，体验内容从顶部连续磨砂层下方经过。保留清晰的标题与操作，以及悬浮底栏和单手操作辅助。</p>
+        <div class="preview-controls">
+          <fieldset><legend>外观</legend><div class="option-group" data-setting="theme"><button data-value="light" aria-pressed="true">浅色</button><button data-value="dark" aria-pressed="false">深色</button><button data-value="auto" aria-pressed="false">跟随系统</button></div></fieldset>
+          <fieldset><legend>光感预览</legend><div class="option-group" data-setting="light"><button data-value="strong" aria-pressed="false">强</button><button data-value="balanced" aria-pressed="true">均衡</button><button data-value="weak" aria-pressed="false">弱</button><button data-value="off" aria-pressed="false">关闭</button></div></fieldset>
+          <fieldset><legend>握姿预览 <small>手动模拟</small></legend><div class="option-group" data-setting="grip"><button data-value="left" aria-pressed="false">左手</button><button data-value="both" aria-pressed="true">双手</button><button data-value="right" aria-pressed="false">右手</button></div></fieldset>
+          <label class="motion-option"><span>减少动态效果</span><input id="reduceMotion" type="checkbox" role="switch"></label>
+        </div>
+        <div class="current-state" aria-live="polite"><span>当前页面</span><strong id="pageTitle">发现 · 推荐</strong><small id="pageStep">频道 1 / 4</small></div>
+        <div class="guide-actions"><button id="previousButton">上一频道</button><button id="nextButton">下一频道</button></div>
+        <p class="preview-note">网页交互预览。材质与握姿识别的原生表现需在 HarmonyOS 真机验证。<a href="./OS7_ADAPTATION.md" target="_blank" rel="noopener">适配说明 ↗</a></p>
+      </aside>
+      <section class="phone-stage" aria-label="HarmonyOS 7 手机预览">
+        <div id="phone" class="phone" tabindex="0"><div id="screen" class="screen"></div><div id="toast" class="toast" role="status"></div></div>
+      </section>
+    </main>
+    <script src="./reference.js"></script>
+    <script src="./os7.js"></script>
+  </body>
+</html>

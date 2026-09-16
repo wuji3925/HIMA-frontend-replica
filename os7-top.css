@@ -1,0 +1,172 @@
+/* A single frosted backdrop spans status and navigation, with crisp foregrounds.
+   Local CSS approximation only; native material owns these effects in ArkUI. */
+.os7-preview {
+  --top-surface:rgb(242 245 248 / 88%);
+  --top-edge:rgb(255 255 255 / 94%);
+  --top-shadow:0 2px 7px rgb(28 43 62 / 7%);
+  --search-surface:rgb(240 244 249 / 78%);
+  --top-press:rgb(203 216 237 / 65%);
+  --header-tint:rgb(246 249 253 / 64%);
+  --header-blur:24px;
+}
+.os7-preview[data-theme="dark"] {
+  --top-surface:rgb(61 69 81 / 82%);
+  --top-edge:rgb(223 233 255 / 17%);
+  --top-shadow:0 2px 8px #00000025;
+  --search-surface:rgb(48 56 69 / 90%);
+  --top-press:rgb(94 116 151 / 70%);
+  color-scheme:dark;
+  --header-tint:rgb(23 28 36 / 72%);
+}
+.os7-preview[data-light="strong"] {--search-surface:rgb(240 244 249 / 62%)}
+.os7-preview[data-theme="dark"][data-light="strong"] {--search-surface:rgb(48 56 69 / 72%)}
+.os7-preview[data-light="weak"] {--search-surface:rgb(240 244 249 / 96%)}
+.os7-preview[data-theme="dark"][data-light="weak"] {--search-surface:rgb(48 56 69 / 98%)}
+.os7-preview[data-light="strong"] {--header-tint:rgb(246 249 253 / 44%);--header-blur:30px}
+.os7-preview[data-theme="dark"][data-light="strong"] {--header-tint:rgb(23 28 36 / 53%)}
+.os7-preview[data-light="weak"] {--header-tint:rgb(246 249 253 / 92%);--header-blur:12px}
+.os7-preview[data-theme="dark"][data-light="weak"] {--header-tint:rgb(23 28 36 / 94%)}
+
+/* 44px hit targets surround 36px visual surfaces, without shifting icon centers. */
+.os7-preview .title-bar {padding-inline:14px;gap:4px}
+.os7-preview .channel-tabs,.os7-preview .select-page .channel-tabs {gap:14px}
+.os7-preview .channel-tabs {position:relative;overflow-x:auto;scrollbar-width:none;touch-action:pan-x;overscroll-behavior-x:contain}
+.os7-preview .channel-tabs[data-more="true"] {mask-image:linear-gradient(to right,#000 calc(100% - 12px),transparent)}
+.os7-preview .header-tools,
+.os7-preview .select-page .header-tools,
+.os7-preview .select-page.light-header .header-tools,
+.os7-preview .car-page .header-tools {gap:6px;margin-left:4px;background:none;flex:none}
+.os7-preview .header-tools .icon-button,
+.os7-preview .select-page.light-header .header-tools .icon-button,
+.os7-preview .category-title .icon-button[aria-label="搜索"] {
+  position:relative;width:44px;height:44px;flex:none;border:0;border-radius:50%;
+  background:none;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;
+  color:var(--os-ink);isolation:isolate;transition:transform 200ms var(--ease);
+}
+.os7-preview .header-tools .icon-button:before,
+.os7-preview .category-title .icon-button[aria-label="搜索"]:before {
+  content:"";position:absolute;inset:4px;z-index:-1;border-radius:50%;
+  background:var(--top-surface);border:1px solid var(--top-edge);box-shadow:var(--top-shadow);
+  transition:background 180ms,transform 220ms var(--ease);
+}
+.os7-preview .select-page.light-header .header-tools .icon-button {color:#fff}
+.os7-preview .select-page.light-header .header-tools .icon-button:before {background:rgb(35 44 58 / 52%);border-color:rgb(235 242 255 / 28%)}
+.os7-preview[data-light="weak"] .select-page.light-header .header-tools .icon-button:before {background:rgb(35 44 58 / 94%)}
+.os7-preview .header-tools .icon-button:active,
+.os7-preview .category-title .icon-button[aria-label="搜索"]:active {opacity:1;transform:scale(.93)}
+.os7-preview .header-tools .icon-button:active:before,
+.os7-preview .category-title .icon-button[aria-label="搜索"]:active:before {background:var(--top-press);transform:scale(.96)}
+.os7-preview .channel-tab {transition:font-size 220ms var(--ease),color 180ms;min-height:44px;line-height:44px}
+.os7-preview .channel-tab:active {opacity:.78}
+.os7-preview .car-page .title-bar h1 {font-size:19px}
+.os7-preview .car-scrolled .title-bar h1 {font-size:17px}
+.os7-preview .car-page .compact-alert {padding:3px 5px;background:var(--os-card);color:var(--os-ink)}
+
+/* The scrolling viewport reaches the screen top; only its initial content is inset.
+   This is necessary for real background sampling rather than a translucent fill. */
+.os7-preview .main-page .tab-viewport,.os7-preview .main-page .plain-scroll {top:0}
+.os7-preview .main-page .scroll-content {padding-top:98px}
+.os7-preview .select-page.shop-overlay [data-panel="0"]>.scroll-content {padding-top:0}
+.os7-preview .tab-panel,.os7-preview .plain-scroll {scroll-padding-top:110px}
+.os7-preview .pull-refresh {top:98px}
+.os7-preview .panel-loader {top:98px}
+.os7-preview .category-body {top:0}
+.os7-preview .category-body>nav {padding-top:105px;scroll-padding-top:110px}
+.os7-preview .category-results {padding-top:103px;scroll-padding-top:110px}
+.os7-preview[data-theme] .main-page .app-header,
+.os7-preview[data-theme] .category-page>header {
+  position:absolute;inset:0 0 auto;height:98px;z-index:20;
+  background:transparent;isolation:auto;backdrop-filter:none;-webkit-backdrop-filter:none;
+}
+.os7-preview .top-backdrop {
+  position:absolute;inset:0 0 auto;height:118px;z-index:19;pointer-events:none;
+  background:var(--header-tint);
+  backdrop-filter:blur(var(--header-blur)) saturate(1.12);
+  -webkit-backdrop-filter:blur(var(--header-blur)) saturate(1.12);
+  mask-image:linear-gradient(#000 0 76%,transparent 100%);
+  -webkit-mask-image:linear-gradient(#000 0 76%,transparent 100%);
+  transition:background-color 180ms;
+}
+.os7-preview .select-page.light-header>.top-backdrop {background:rgb(16 23 34 / 66%)}
+.os7-preview[data-light="weak"] .select-page.light-header>.top-backdrop {background:rgb(16 23 34 / 94%)}
+/* Buttons sit on that one backdrop, never on a second blur layer. */
+.os7-preview[data-theme] .main-page .header-tools .icon-button:before,
+.os7-preview[data-theme] .category-title .icon-button[aria-label="搜索"]:before {
+  backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;
+  background:rgb(250 252 255 / 20%);border-color:rgb(255 255 255 / 24%);
+}
+.os7-preview[data-theme="dark"] .main-page .header-tools .icon-button:before,
+.os7-preview[data-theme="dark"] .category-title .icon-button[aria-label="搜索"]:before {background:rgb(150 168 195 / 12%);border-color:rgb(220 232 255 / 12%)}
+
+/* Search keeps a lightweight fill. Its scrolling surface and sheet input do not
+   add another blur beneath the continuous header or inside a material sheet. */
+.os7-preview .search-field,
+.os7-preview[data-theme="dark"] .search-field {
+  position:relative;height:44px;border-radius:24px;background:var(--search-surface);
+  border:1px solid var(--top-edge);box-shadow:0 2px 6px #17345106;color:var(--os-muted);
+  backdrop-filter:blur(var(--material-blur));-webkit-backdrop-filter:blur(var(--material-blur));
+  transition:transform 200ms var(--ease),background 180ms;gap:9px;
+}
+.os7-preview .search-field:active {opacity:1;transform:scale(.985)}
+.os7-preview .main-page .search-field {backdrop-filter:none;-webkit-backdrop-filter:none}
+.os7-preview .search-field .search-hint {font-size:13px;letter-spacing:.02em;opacity:.85}
+.os7-preview .os7-search-box:focus-within {outline:2px solid var(--blue);outline-offset:2px}
+
+/* Content filtering stays a standard solid component, not a row of glass. */
+.os7-preview .brand-filter {top:110px;height:58px;padding-left:12px;align-items:center}
+.os7-preview .brand-options {gap:6px;height:44px;align-items:center}
+.os7-preview .brand {min-width:48px;height:32px;padding:0 10px;border:1px solid var(--os-line);border-radius:18px;background:var(--os-bg);font-size:14px;line-height:30px;transition:color 170ms,background 170ms,transform 170ms}
+.os7-preview .brand.active,.os7-preview[data-theme="dark"] .brand.active {color:#fff;background:#075afa;border-color:#075afa}
+.os7-preview .brand.active:after {display:none}
+.os7-preview .brand:active {opacity:1;transform:scale(.96)}
+.os7-preview .filter-tools {gap:0;padding:0 8px 0 4px;background:inherit}
+.os7-preview .filter-tools .icon-button {width:36px;height:44px;border-radius:18px}
+.os7-preview .filter-tools .icon-button[aria-pressed="true"] {color:var(--blue)}
+.os7-preview .category-title {gap:10px;padding-inline:14px}
+.os7-preview .category-title>[data-back] {width:44px;height:44px;border-radius:50%;background:none}
+
+/* New top action demos reuse THICK menus and ULTRA_THICK sheets. */
+.os7-preview .os7-menu {transform-origin:calc(100% - 22px) 0}
+.os7-preview .os7-action-menu button {gap:12px;justify-content:flex-start}
+.os7-preview .os7-action-menu button svg {width:20px;height:20px}
+.os7-preview .os7-component-note {color:var(--os-muted);font-size:12px;line-height:1.8;margin:14px 0}
+.os7-preview .os7-message-list {display:grid;gap:0}
+.os7-preview .os7-message {display:flex;gap:12px;padding:17px 0;border-bottom:1px solid var(--os-line);text-align:left}
+.os7-preview .os7-message>svg {width:36px;height:36px;padding:7px;border-radius:12px;background:var(--os-bg);color:var(--blue)}
+.os7-preview .os7-message strong {font-size:15px;font-weight:550;display:block;margin-bottom:7px}
+.os7-preview .os7-message p {font-size:13px;line-height:1.7;color:var(--os-muted)}
+.os7-preview .os7-component-primary {width:100%;height:44px;margin-top:18px;border-radius:23px;background:#075afa;color:white;font-size:15px}
+.os7-preview .os7-draft {width:100%;min-height:145px;resize:vertical;padding:14px;border:1px solid var(--os-line);background:var(--os-bg);color:var(--os-ink);border-radius:14px;font:inherit;font-size:15px;line-height:1.8}
+.os7-preview .os7-code-preview {display:grid;place-items:center;height:180px;gap:12px;background:var(--os-bg);border-radius:18px;text-align:center;color:var(--os-muted);padding:24px}
+.os7-preview .os7-code-preview svg {width:72px;height:72px;color:var(--os-ink);stroke-width:1.2}
+.os7-preview .os7-code-preview p {font-size:12px;line-height:1.8}
+.os7-preview .toast {background:var(--thick);color:var(--os-ink);border:1px solid var(--edge);box-shadow:var(--material-shadow);backdrop-filter:blur(var(--material-blur));-webkit-backdrop-filter:blur(var(--material-blur));white-space:normal;text-align:center;max-width:85%;width:max-content}
+.os7-preview[data-light="off"] .search-field,.os7-preview[data-light="off"] .toast {background:var(--os-card);backdrop-filter:none;-webkit-backdrop-filter:none}
+.os7-preview[data-light="off"] .header-tools .icon-button:before {background:var(--os-bg);backdrop-filter:none;-webkit-backdrop-filter:none;border-color:var(--os-line)}
+.os7-preview[data-light="off"] .select-page.light-header .header-tools .icon-button:before {background:#eef2f8}
+.os7-preview[data-light="off"] .select-page.light-header .header-tools .icon-button {color:#152031}
+.os7-preview[data-motion="reduce"] .header-tools .icon-button:active,
+.os7-preview[data-motion="reduce"] .header-tools .icon-button:active:before,
+.os7-preview[data-motion="reduce"] .search-field:active {transform:none}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
+  .os7-preview .search-field,.os7-preview .toast {background:var(--os-card)}
+  .os7-preview .header-tools .icon-button:before {background:var(--os-bg)}
+  .os7-preview .select-page.light-header .header-tools .icon-button:before {background:#eef2f8}
+  .os7-preview .select-page.light-header .header-tools .icon-button {color:#152031}
+}
+/* Opaque fallback keeps the same content layout, without translucent leftovers. */
+.os7-preview[data-light="off"] .top-backdrop {
+  height:98px;background:var(--os-card);backdrop-filter:none;-webkit-backdrop-filter:none;mask-image:none;-webkit-mask-image:none;
+}
+.os7-preview[data-light="off"] .select-page.light-header>.top-backdrop {background:#141b26}
+.os7-preview[data-light="off"] .select-page.light-header .header-tools .icon-button {color:#fff}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
+  .os7-preview .top-backdrop {height:98px;background:var(--os-card);mask-image:none;-webkit-mask-image:none}
+  .os7-preview .select-page.light-header>.top-backdrop {background:#141b26}
+  .os7-preview .select-page.light-header .header-tools .icon-button {color:#fff}
+}
+/* Remove the status artwork's white matte without blurring its foreground ink. */
+.os7-preview .status-bar .system-network {filter:url(#os7-status-ink);mix-blend-mode:normal}
+.os7-preview[data-theme="dark"] .status-bar .system-network,
+.os7-preview .light-header .status-bar .system-network {filter:url(#os7-status-ink) invert(1)}
+.os7-preview .status-bar .system-apps {mix-blend-mode:normal;clip-path:path('M1 2H14V15H1Z M17 2H30V15H17Z M35 2H48V15H35Z M53 2H67V15H53Z M71 2H83V15H71Z')}
