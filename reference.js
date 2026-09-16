@@ -141,17 +141,29 @@ function updateGuide() {
 function setupChannels(page,id) {
   const viewport=page.querySelector('.tab-viewport'),track=page.querySelector('.tab-track');
   const visited=new Set([state.channel[id]]);
-  const setIndex=(next,load=true)=>{
+  const setIndex=(next,load=true,interaction='tap',releaseSpeed=0)=>{
     const index=Math.max(0,Math.min(3,next)); const changed=index!==state.channel[id]; state.channel[id]=index;
-    track.style.transitionDuration=reducedMotion?'0ms':'280ms';track.style.transform=`translate3d(${-index*W}px,0,0)`;
+    const swipeDuration=Math.max(150,Math.min(260,240-Math.abs(releaseSpeed)*70));
+    track.style.transitionDuration=reducedMotion||interaction!=='swipe'?'0ms':`${swipeDuration}ms`;
+    track.style.transitionTimingFunction='cubic-bezier(.2,.78,.2,1)';
+    track.style.transform=`translate3d(${-index*W}px,0,0)`;
     page.querySelectorAll('.channel-tab').forEach((tab,i)=>{tab.classList.toggle('active',i===index);tab.setAttribute('aria-selected',String(i===index));tab.tabIndex=i===index?0:-1;});
     page.querySelectorAll('.tab-panel').forEach((panel,i)=>panel.inert=i!==index);
     const toolbar=page.querySelector('.collection-actions');if(toolbar)toolbar.hidden=index!==3;
-    if(changed&&load&&!visited.has(index)) {visited.add(index);const loader=page.querySelector(`[data-panel="${index}"] .panel-loader`);loader.hidden=false;setTimeout(()=>loader.hidden=true,id==='discover'&&index===3?900:420);}
+    if(changed&&load&&!visited.has(index)) {
+      visited.add(index);
+      const panel=page.querySelector(`[data-panel="${index}"]`),loader=panel.querySelector('.panel-loader');
+      loader.hidden=false;loader.classList.remove('chrome-ready');panel.setAttribute('aria-busy','true');
+      // The recording switches tapped channels immediately. Dynamic restores
+      // its filter chrome first, while the feed remains in the loading state.
+      if(id==='discover'&&index===1)setTimeout(()=>loader.classList.add('chrome-ready'),230);
+      const duration=id==='discover'?(index===3?980:1080):720;
+      setTimeout(()=>{loader.hidden=true;loader.classList.remove('chrome-ready');panel.removeAttribute('aria-busy');},duration);
+    }
     updateChrome(page,id);if(state.main===id)updateGuide();
   };
   page.setChannel=setIndex;
-  page.querySelectorAll('[data-channel]').forEach(button=>button.addEventListener('click',()=>setIndex(Number(button.dataset.channel))));
+  page.querySelectorAll('[data-channel]').forEach(button=>button.addEventListener('click',()=>setIndex(Number(button.dataset.channel),true,'tap')));
   let drag;
   viewport.addEventListener('pointerdown',event=>{
     if(event.button>0||event.target.closest('[data-horizontal],.collection-actions'))return;
@@ -174,10 +186,10 @@ function setupChannels(page,id) {
     const last=drag;drag=null;if(last.axis!=='x')return;
     const recent=performance.now()-last.time<90?last.speed:0;
     const advance=event.type!=='pointercancel'&&(Math.abs(last.dx)>W*.25||Math.abs(recent)>.45&&Math.abs(last.dx)>14);
-    setIndex(state.channel[id]+(advance?(last.dx<0?1:-1):0));
+    setIndex(state.channel[id]+(advance?(last.dx<0?1:-1):0),true,'swipe',recent);
   }
   viewport.addEventListener('pointerup',end);viewport.addEventListener('pointercancel',end);
-  setIndex(state.channel[id],false);
+  setIndex(state.channel[id],false,'instant');
 }
 function setupScroller(scroller,page,id) {
   let drag,momentum,refreshTimer;
