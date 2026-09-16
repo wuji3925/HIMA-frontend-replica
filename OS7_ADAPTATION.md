@@ -6,15 +6,26 @@
 
 ## 依据与状态
 
-2026-09-09 核对的官方资料：
+2026-09-17 重新核对了 HarmonyOS 当前官方设计与开发文档，完整结论、组件全景、产品/研发路径和验收清单见 [HARMONYOS_7_DESIGN_LANGUAGE.md](./HARMONYOS_7_DESIGN_LANGUAGE.md)。
 
-- [ArkUI 沉浸光感简介](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/arkts-immersive-light-sense-overview)：官方页面更新于 2026-09-01，说明原生能力从 API 26.0.0 开始，包含系统材质与空间动效，并限定组件生效区域。
-- [沉浸光感兼容性适配](https://developer.huawei.com/consumer/cn/doc/HarmonyOS-Guides/arkts-immersive-light-sense-compatibility)：低版本需要保持原有样式，避免与材质冲突的背景、模糊等属性叠加。
-- [多设备通用适配指南](https://developer.huawei.com/consumer/cn/multidevice/adaptive-apps/)：说明智感握姿可感知左手、右手、双手、未握持，并据此调整 UI。
-
-网页遵循项目 `06_鸿蒙智行沉浸光感设计语言_v1.0.md` 的组件语义和使用范围。旧设计文档入口部分正文抓取失败，本次使用上述可读官方页面校核能力边界，不将历史静态样图当作原生参数。
+- [设计理念](https://developer.huawei.com/consumer/cn/doc/design-guides/design-concepts-0000001795698445)：One / Harmonious / Universe，要求人因可读、物理隐喻和多设备一致与差异的平衡。
+- [色彩](https://developer.huawei.com/consumer/cn/doc/design-guides/color-0000001776857164)、[间隔参数](https://developer.huawei.com/consumer/cn/doc/design-guides/interval-parameter-0000002562577161)、[鸿蒙黑体](https://developer.huawei.com/consumer/cn/doc/design-guides/font-0000001828772001)：语义 Token、深浅色、4/8vp 间距和 HarmonyOS Sans 是基础层。
+- [动效设计原则](https://developer.huawei.com/consumer/cn/doc/design-guides/animation-design-principles-0000001750237392)、[动效属性](https://developer.huawei.com/consumer/cn/doc/design-guides/animation-attributes-0000001797117229)、[手势动效](https://developer.huawei.com/consumer/cn/doc/design-guides/gesture-animation-0000001797038213)：按下立即反馈，时长按 100/150/200/350ms 范围和运动尺度分级，跟手运动继承手速。
+- [沉浸光感设计](https://developer.huawei.com/consumer/cn/doc/design-guides/immersivelight-0000002612101053)、[ArkUI 沉浸光感简介](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/arkts-immersive-light-sense-overview)：从 API 26.0.0 开始，原生能力由系统材质和空间动效构成，并受组件生效范围、用户设置和设备算力约束。
+- [智感握姿](https://developer.huawei.com/consumer/cn/doc/design-guides/smart-reachability-0000002556657823)：仅调整高频且单手难触达操作，不移动正在按压的目标。
+- [最新粒子动画](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/arkts-particle-animation)：以发射器、颜色分布、生命周期和扰动场控制信息反馈。用户给出的 `-V13` 文档已归档，本次以当前文档为准。
 
 本页是**网页交互预览**，不是已接入系统材质、传感器或已通过 HarmonyOS 原生验收的应用。模糊、透明度、圆角、时间和位移都是该网页的演示取值，不是官方 HDS 标注值；强弱开关也不是读取或修改用户系统设置。
+
+## 2026-09-17 完整设计语言适配
+
+- 样式 Token 从“模糊强弱”升级为 `font / brand / container / interactive` 语义色和 `ULTRA_THIN / THIN / REGULAR / THICK / ULTRA_THICK` 五级材质角色。
+- 顶部标题区保持内容滚动联动，底部页签使用 THIN，搜索半模态和对话层使用 ULTRA_THICK，菜单使用 THICK，单手辅助使用 ULTRA_THIN。
+- 按压事件色使用 100ms，小范围缩放 150ms，菜单 250ms，半模态 350ms；入场使用减速曲线，出场使用加速曲线。
+- 菜单和半模态增加一次性非线性形变与边缘光过渡；关闭、弱档和减少动态时降级。
+- 扫码模拟识别成功时增加有限生命周期粒子，仅表达信息变化，不做页面背景效果。
+- 滚动区在越过 8px 后向顶部层提供轻量分层信号，不模糊标题与图标前景。
+- 智感握姿依然是手动模拟；整组底部导航和低风险频道辅助保持水平迁移，按压期间延后变更，车控与交易不迁移。
 
 ## 组件映射
 

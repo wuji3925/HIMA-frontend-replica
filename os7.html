@@ -15,7 +15,7 @@
       <aside class="demo-guide" aria-label="适配预览设置">
         <div class="preview-heading"><p class="eyebrow">HIMA · HARMONYOS 7</p><a id="referenceLink" href="./index.html">查看原版 ↗</a></div>
         <h1>熟悉的智行<br>更自然的交互</h1>
-        <p class="guide-copy">向上滑动，体验内容从顶部连续磨砂层下方经过。保留清晰的标题与操作，以及悬浮底栏和单手操作辅助。</p>
+        <p class="guide-copy">向上滑动，体验内容从顶部系统材质下方经过；打开搜索、菜单和扫码可体验分层材质、空间动效与克制的信息反馈。</p>
         <div class="preview-controls">
           <fieldset><legend>外观</legend><div class="option-group" data-setting="theme"><button data-value="light" aria-pressed="true">浅色</button><button data-value="dark" aria-pressed="false">深色</button><button data-value="auto" aria-pressed="false">跟随系统</button></div></fieldset>
           <fieldset><legend>光感预览</legend><div class="option-group" data-setting="light"><button data-value="strong" aria-pressed="false">强</button><button data-value="balanced" aria-pressed="true">均衡</button><button data-value="weak" aria-pressed="false">弱</button><button data-value="off" aria-pressed="false">关闭</button></div></fieldset>
@@ -24,7 +24,13 @@
         </div>
         <div class="current-state" aria-live="polite"><span>当前页面</span><strong id="pageTitle">发现 · 推荐</strong><small id="pageStep">频道 1 / 4</small></div>
         <div class="guide-actions"><button id="previousButton">上一频道</button><button id="nextButton">下一频道</button></div>
-        <p class="preview-note">网页交互预览。材质与握姿识别的原生表现需在 HarmonyOS 真机验证。<a href="./OS7_ADAPTATION.md" target="_blank" rel="noopener">适配说明 ↗</a></p>
+        <details class="feature-coverage">
+          <summary>OS7 特性覆盖 <span>8 类</span></summary>
+          <ul>
+            <li>语义色彩与 4/8vp 间距</li><li>五级系统材质角色</li><li>滚动联动标题区</li><li>点击、滑动与下拉阻尼</li><li>菜单与半模态空间动效</li><li>信息变化粒子反馈</li><li>智感握姿手动模拟</li><li>深色与减少动态降级</li>
+          </ul>
+        </details>
+        <p class="preview-note">网页交互预览。材质、空间动效与握姿识别的原生表现需在 HarmonyOS 真机验证。<a href="./HARMONYOS_7_DESIGN_LANGUAGE.md" target="_blank" rel="noopener">设计语言 ↗</a><a href="./OS7_ADAPTATION.md" target="_blank" rel="noopener">适配说明 ↗</a></p>
       </aside>
       <section class="phone-stage" aria-label="HarmonyOS 7 手机预览">
         <div id="phone" class="phone" tabindex="0"><div id="screen" class="screen"></div><div id="toast" class="toast" role="status"></div></div>

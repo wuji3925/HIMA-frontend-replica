@@ -87,6 +87,18 @@
   window.addEventListener('pointercancel', release, true);
   window.addEventListener('blur', () => { pointers.clear(); if (queuedGrip) { body.dataset.grip = queuedGrip; queuedGrip = null; } });
 
+  function dismissOverlay() {
+    const closing = layer;
+    if (!closing?.classList.contains('os7-overlay') || body.dataset.motion === 'reduce') { closeLayer(); return; }
+    if (closing.classList.contains('is-closing')) return;
+    closing.classList.add('is-closing');
+    closing.style.pointerEvents = 'none';
+    const duration = closing.querySelector('.os7-menu') ? 180 : 220;
+    setTimeout(() => {
+      if (layer === closing) closeLayer();
+      else closing.remove();
+    }, duration);
+  }
   function mountOverlay(html, label) {
     closeLayer();
     modalTrigger = document.activeElement;
@@ -97,8 +109,8 @@
     screen.append(layer);
     host.inert = true;
     nav.inert = true;
-    layer.querySelector('.os7-scrim').addEventListener('click', closeLayer);
-    layer.querySelectorAll('[data-close]').forEach(button => button.addEventListener('click', closeLayer));
+    layer.querySelector('.os7-scrim').addEventListener('click', dismissOverlay);
+    layer.querySelectorAll('[data-close]').forEach(button => button.addEventListener('click', dismissOverlay));
     return layer;
   }
   function openSearch() {
@@ -145,8 +157,8 @@
     const end = event => {
       if (!drag || drag.id !== event.pointerId) return;
       const distance = drag.delta; drag = null;
-      if (event.type !== 'pointercancel' && distance > 72) closeLayer();
-      else { sheet.style.transition = 'transform 220ms ease-out'; sheet.style.transform = ''; }
+      if (event.type !== 'pointercancel' && distance > 72) dismissOverlay();
+      else { sheet.style.transition = 'transform 220ms var(--ease-enter)'; sheet.style.transform = ''; }
     };
     handle.addEventListener('pointerup', end); handle.addEventListener('pointercancel', end);
   }
@@ -159,6 +171,26 @@
     enableSheetDrag(overlay.querySelector('.os7-sheet'));
     overlay.querySelector('[data-close]').focus({ preventScroll: true });
     return overlay;
+  }
+  function emitParticles(target) {
+    if (!target || body.dataset.motion === 'reduce' || ['off', 'weak'].includes(body.dataset.light)) return;
+    target.querySelector('.os7-particle-burst')?.remove();
+    target.querySelector('.os7-particle-core')?.remove();
+    const burst = document.createElement('span'); burst.className = 'os7-particle-burst'; burst.setAttribute('aria-hidden', 'true');
+    const colors = ['#0A59F7', '#77A7FF', '#C9DDFF', '#FFFFFF'];
+    for (let index = 0; index < 12; index += 1) {
+      const particle = document.createElement('i'); particle.className = 'os7-particle';
+      const angle = index / 12 * Math.PI * 2; const distance = 34 + index % 3 * 11;
+      particle.style.setProperty('--particle-x', `${Math.cos(angle) * distance}px`);
+      particle.style.setProperty('--particle-y', `${Math.sin(angle) * distance}px`);
+      particle.style.setProperty('--particle-color', colors[index % colors.length]);
+      particle.style.setProperty('--size', `${3 + index % 3}px`);
+      particle.style.setProperty('--delay', `${index % 4 * 14}ms`);
+      burst.append(particle);
+    }
+    const core = document.createElement('span'); core.className = 'os7-particle-core'; core.setAttribute('aria-hidden', 'true');
+    target.append(burst, core);
+    setTimeout(() => { burst.remove(); core.remove(); }, 760);
   }
   function openPublish(anchor) {
     const overlay = mountOverlay(`<div class="os7-menu os7-action-menu" role="menu" aria-label="发布内容"><button role="menuitem" data-compose="图文">${svg('edit')}<span>发布图文</span></button><button role="menuitem" data-compose="视频">${svg('screens')}<span>发布视频</span></button></div>`, '发布内容');
@@ -184,8 +216,10 @@
     } else if (label === '扫一扫') {
       const overlay = componentSheet('扫一扫', `<div class="os7-code-preview">${svg('scan')}<p>扫码区域预览<br>未调用摄像头，不读取真实二维码</p></div><button class="os7-component-primary" data-scan-demo>模拟识别</button>`);
       overlay.querySelector('[data-scan-demo]').addEventListener('click', () => {
-        overlay.querySelector('.os7-code-preview p').textContent = '演示识别完成 · 鸿蒙智行体验中心';
+        const preview = overlay.querySelector('.os7-code-preview');
+        preview.querySelector('p').textContent = '演示识别完成 · 鸿蒙智行体验中心';
         overlay.querySelector('[data-scan-demo]').textContent = '重新模拟识别';
+        emitParticles(preview);
       });
     } else if (label === '个人二维码') {
       componentSheet('个人二维码', `<div class="os7-code-preview">${svg('qr')}<p>个人名片示意<br>此图标不是可识别二维码</p></div><p class="os7-component-note">仅用于验证弹层样式与交互，未包含账号或身份信息。</p>`);
@@ -239,6 +273,16 @@
           tabs.dataset.more = String(tabs.scrollLeft + tabs.clientWidth < tabs.scrollWidth - 2);
         }, body.dataset.motion === 'reduce' ? 0 : 240);
       }
+    });
+    screen.querySelectorAll('.tab-panel,.plain-scroll,.category-results').forEach(scroller => {
+      if (scroller.dataset.os7Scroll) return;
+      scroller.dataset.os7Scroll = 'true';
+      scroller.addEventListener('scroll', () => {
+        const page = scroller.closest('.main-page,.category-page');
+        if (!page) return;
+        page.classList.toggle('os7-scrolled', scroller.scrollTop > 8);
+        page.style.setProperty('--os7-scroll', String(Math.min(1, scroller.scrollTop / 72)));
+      }, { passive: true });
     });
     screen.querySelectorAll('.search-field,.header-tools button[aria-label="搜索"],.category-title button[aria-label="搜索"]').forEach(button => {
       if (button.dataset.os7Search) return; button.dataset.os7Search = 'true';
