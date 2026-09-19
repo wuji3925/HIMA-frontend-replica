@@ -145,13 +145,16 @@ function setupChannels(page,id) {
   const setIndex=(next,load=true,interaction='tap',releaseSpeed=0)=>{
     const index=Math.max(0,Math.min(3,next)); const changed=index!==state.channel[id]; state.channel[id]=index;
     const swipeDuration=Math.max(150,Math.min(260,240-Math.abs(releaseSpeed)*70));
-    track.style.transitionDuration=reducedMotion||interaction!=='swipe'?'0ms':`${swipeDuration}ms`;
-    track.style.transitionTimingFunction='cubic-bezier(.2,.78,.2,1)';
-    track.style.transform=`translate3d(${-index*W}px,0,0)`;
+    if(page.os7Motion) page.os7Motion.to(-index*W, interaction, releaseSpeed);
+    else {
+      track.style.transitionDuration=reducedMotion||interaction!=='swipe'?'0ms':`${swipeDuration}ms`;
+      track.style.transitionTimingFunction='cubic-bezier(.2,.78,.2,1)';
+      track.style.transform=`translate3d(${-index*W}px,0,0)`;
+    }
     page.querySelectorAll('.channel-tab').forEach((tab,i)=>{tab.classList.toggle('active',i===index);tab.setAttribute('aria-selected',String(i===index));tab.tabIndex=i===index?0:-1;});
     page.querySelectorAll('.tab-panel').forEach((panel,i)=>panel.inert=i!==index);
     const toolbar=page.querySelector('.collection-actions');if(toolbar)toolbar.hidden=index!==3;
-    if(changed&&load&&!visited.has(index)) {
+    if(changed&&load&&!visited.has(index)&&!page.os7Motion) {
       visited.add(index);
       const panel=page.querySelector(`[data-panel="${index}"]`),loader=panel.querySelector('.panel-loader');
       loader.hidden=false;loader.classList.remove('chrome-ready');panel.setAttribute('aria-busy','true');
@@ -162,6 +165,7 @@ function setupChannels(page,id) {
       setTimeout(()=>{loader.hidden=true;loader.classList.remove('chrome-ready');panel.removeAttribute('aria-busy');},duration);
     }
     updateChrome(page,id);if(state.main===id)updateGuide();
+    page.dispatchEvent(new Event('channelchange'));
   };
   page.setChannel=setIndex;
   page.querySelectorAll('[data-channel]').forEach(button=>button.addEventListener('click',()=>setIndex(Number(button.dataset.channel),true,'tap')));
@@ -169,23 +173,34 @@ function setupChannels(page,id) {
   viewport.addEventListener('pointerdown',event=>{
     if(event.button>0||event.target.closest('[data-horizontal],.collection-actions'))return;
     const scale=phone.clientWidth/W;
-    drag={id:event.pointerId,x:event.clientX/scale,y:event.clientY/scale,last:event.clientX/scale,time:performance.now(),speed:0,axis:null,dx:0};
+    drag={id:event.pointerId,x:event.clientX/scale,y:event.clientY/scale,last:event.clientX/scale,time:performance.now(),speed:0,axis:null,dx:0,start:page.os7Motion?.position()};
   });
   viewport.addEventListener('pointermove',event=>{
     if(!drag||event.pointerId!==drag.id)return;
     const scale=phone.clientWidth/W,x=event.clientX/scale,y=event.clientY/scale,dx=x-drag.x,dy=y-drag.y,now=performance.now();
-    if(!drag.axis&&Math.hypot(dx,dy)>7)drag.axis=Math.abs(dx)>Math.abs(dy)*1.15?'x':'y';
+    if(!drag.axis&&Math.hypot(dx,dy)>7) {
+      drag.axis=Math.abs(dx)>Math.abs(dy)*1.15?'x':'y';
+      if(drag.axis==='x'&&page.os7Motion)drag.start=page.os7Motion.grab();
+    }
     if(drag.axis!=='x')return;
     event.preventDefault();viewport.setPointerCapture(event.pointerId);blockedClick=now+350;
     drag.speed=(x-drag.last)/Math.max(8,now-drag.time);drag.last=x;drag.time=now;drag.dx=dx;
     const index=state.channel[id],edge=index===0&&dx>0||index===3&&dx<0;
     const offset=edge?Math.sign(dx)*W*.16*(1-Math.exp(-Math.abs(dx)/W)):Math.max(-W,Math.min(W,dx));
-    track.style.transitionDuration='0ms';track.style.transform=`translate3d(${-index*W+offset}px,0,0)`;
+    if(page.os7Motion) page.os7Motion.drag(drag.start+offset);
+    else {track.style.transitionDuration='0ms';track.style.transform=`translate3d(${-index*W+offset}px,0,0)`;}
   });
   function end(event) {
     if(!drag||event.pointerId!==drag.id)return;
     const last=drag;drag=null;if(last.axis!=='x')return;
     const recent=performance.now()-last.time<90?last.speed:0;
+    if(page.os7Motion) {
+      const target=event.type==='pointercancel'?last.start:page.os7Motion.position()+recent*140;
+      const origin=Math.round(-last.start/W);
+      const next=Math.max(origin-1,Math.min(origin+1,Math.round(-target/W)));
+      setIndex(next,true,'swipe',event.type==='pointercancel'?0:recent);
+      return;
+    }
     const advance=event.type!=='pointercancel'&&(Math.abs(last.dx)>W*.25||Math.abs(recent)>.45&&Math.abs(last.dx)>14);
     setIndex(state.channel[id]+(advance?(last.dx<0?1:-1):0),true,'swipe',recent);
   }

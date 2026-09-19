@@ -1,0 +1,129 @@
+/* 2026-09-20: component hierarchy and continuous motion, OS7 entry only.
+   Dimensions below are web preview decisions, not native HDS specifications. */
+.os7-preview {
+  --os-ink:#17191c; --os-muted:#6b6e75; --os-bg:#f5f5f5;
+  --os-line:rgb(0 0 0 / 7%); --os-brand:#0a59f7;
+  --material-shadow:0 4px 18px rgb(0 0 0 / 9%);
+  --material-thin:rgb(250 250 250 / 76%);
+  --material-ultra-thick:rgb(250 250 250 / 94%);
+  --edge:rgb(255 255 255 / 60%);
+}
+.os7-preview[data-theme="dark"] {
+  --os-ink:#f1f1f1; --os-muted:#b4b4b8; --os-bg:#141416;
+  --os-line:rgb(255 255 255 / 10%); --os-brand:#82aeff;
+  --material-thin:rgb(36 36 39 / 82%);
+  --material-ultra-thick:rgb(36 36 39 / 96%);
+  --edge:rgb(255 255 255 / 12%);
+}
+.os7-preview[data-light="strong"] {--material-thin:rgb(250 250 250 / 62%)}
+.os7-preview[data-theme="dark"][data-light="strong"] {--material-thin:rgb(36 36 39 / 68%)}
+.os7-preview[data-light="weak"] {--material-thin:var(--os-card);--material-ultra-thick:var(--os-card)}
+.os7-preview[data-light="off"] {--material-thin:var(--os-card);--material-ultra-thick:var(--os-card)}
+
+/* APK navigation silhouettes retain their two-tone shape but use the intended
+   active/inactive semantic colors, rather than legacy raster-era variables. */
+.os7-preview .bottom-nav {box-shadow:var(--material-shadow);backdrop-filter:blur(26px) saturate(1.02);-webkit-backdrop-filter:blur(26px) saturate(1.02)}
+.os7-preview .bottom-nav button {
+  --nav-primary:#242528;--nav-secondary:#919297;--nav-cutout:#f5f5f5;
+  padding-top:9px;gap:3px;color:var(--font-primary);
+}
+.os7-preview .bottom-nav button.active {--nav-primary:var(--os-brand);--nav-secondary:#9dbcfb;color:var(--os-brand)}
+.os7-preview[data-theme="dark"] .bottom-nav button {--nav-primary:#efeff2;--nav-secondary:#909095;--nav-cutout:#242427}
+.os7-preview[data-theme="dark"] .bottom-nav button.active {--nav-primary:var(--os-brand);--nav-secondary:#5375b0}
+.os7-preview .bottom-nav button:active {transform:scale(.96);background:transparent}
+.os7-preview .screen:after {height:88px;background:linear-gradient(transparent,var(--os-bg))}
+
+/* Header tint follows actual overlap. A neutral material sits below readable
+   foregrounds; no per-button bevels on top of the same material. */
+.os7-preview .main-page,.os7-preview .category-page {--os7-scroll:0;--os7-hero:1;--chrome-height:98px}
+.os7-preview .top-backdrop {
+  height:calc(var(--chrome-height) + 24px);
+  background:color-mix(in srgb,var(--os-card) calc(58% + var(--os7-scroll)*22%),transparent);
+  backdrop-filter:blur(var(--header-blur)) saturate(1.02);
+  -webkit-backdrop-filter:blur(var(--header-blur)) saturate(1.02);
+  mask-image:linear-gradient(#000 0 calc(100% - 34px),rgb(0 0 0 / 88%) calc(100% - 22px),transparent);
+  -webkit-mask-image:linear-gradient(#000 0 calc(100% - 34px),rgb(0 0 0 / 88%) calc(100% - 22px),transparent);
+  box-shadow:none!important;filter:none!important;transition:none;
+}
+.os7-preview[data-theme] .main-page .header-tools .icon-button:before {
+  background:transparent;border:0;box-shadow:none;
+}
+.os7-preview .header-tools .icon-button svg {width:22px;height:22px;stroke-width:1.65}
+.os7-preview .header-tools .icon-button:active {transform:scale(.94)}
+.os7-preview[data-theme] .main-page .header-tools .icon-button:active:before {background:var(--interactive-pressed)}
+.os7-preview .channel-tab {font-size:20px!important;font-weight:500;line-height:44px;transition:color 150ms}
+.os7-preview .channel-tab span {display:inline-block;transform:scale(.9);transform-origin:left center;transition:transform 200ms var(--ease-standard)}
+.os7-preview .channel-tab.active {font-weight:650}
+.os7-preview .channel-tab.active span {transform:scale(1)}
+
+/* Selected-page specimen: title/actions and four channels get their own rows.
+   Every label is visible and keeps the same footprint during a selection. */
+.os7-preview .select-page {--chrome-height:142px;--chrome-ink:var(--os-ink)}
+.os7-preview[data-theme] .select-page .app-header {height:142px}
+.os7-preview .select-page .title-bar {height:104px;padding:0 16px;display:block;position:relative}
+.os7-preview .select-page .os7-page-title {position:absolute;left:16px;top:1px;font-size:26px;font-weight:650;line-height:48px;letter-spacing:0}
+.os7-preview .select-page .header-tools {position:absolute;right:12px;top:2px;gap:4px;margin:0}
+.os7-preview .select-page .channel-tabs {position:absolute;left:16px;right:16px;bottom:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;overflow:visible;mask-image:none}
+.os7-preview .select-page .channel-tab {width:100%;font-size:17px!important;line-height:44px;text-align:center;font-weight:400}
+.os7-preview .select-page .channel-tab span {transform:none}
+.os7-preview .select-page .channel-tab.active {font-weight:650}
+.os7-preview .select-page .channel-tab {color:color-mix(in srgb,var(--chrome-ink) 70%,transparent)}
+.os7-preview[data-theme] .select-page .channel-tab.active,
+.os7-preview[data-theme] .select-page .status-bar,
+.os7-preview[data-theme] .select-page .os7-page-title,
+.os7-preview[data-theme] .select-page .header-tools .icon-button {color:var(--chrome-ink)}
+.os7-preview .select-page .status-bar .system-network {filter:url(#os7-status-ink)}
+.os7-preview[data-theme="dark"] .select-page .status-bar .system-network {filter:url(#os7-status-ink) invert(1)}
+.os7-preview .select-page>.top-backdrop,
+.os7-preview .select-page.light-header>.top-backdrop {
+  background:color-mix(in srgb,var(--os-card) calc(76% + var(--os7-scroll)*10%),transparent);
+}
+.os7-preview .select-page .tab-panel>.scroll-content {padding-top:142px}
+.os7-preview .select-page.shop-overlay [data-panel="0"]>.scroll-content {padding-top:0}
+.os7-preview .select-page .shop-banner {padding-top:142px;background:var(--os-bg)}
+.os7-preview .select-page .tab-panel {scroll-padding-top:158px}
+.os7-preview .select-page .product-rail {gap:8px;padding-inline:16px;margin-top:20px}
+.os7-preview .select-page .product-rail>button {border-radius:12px}
+.os7-preview .select-page .shop-section {padding:24px 16px}
+.os7-preview .select-page .section-title {font-size:20px;line-height:28px;margin-bottom:16px}
+.os7-preview .select-page .section-title .more {font-size:12px;color:var(--font-secondary)}
+.os7-preview .select-page .products {gap:20px 12px}
+.os7-preview .select-page .product>img {width:100%;height:auto;aspect-ratio:1;border-radius:12px}
+.os7-preview .select-page .product>p {font-size:14px;line-height:20px;margin-top:8px}
+.os7-preview .select-page .product>span {font-size:16px;line-height:24px;font-weight:600;font-variant-numeric:tabular-nums}
+
+/* Sheet motion is driven by a single interruptible spring. Large grab region;
+   its visual handle remains small. No sweep across the content. */
+.os7-preview .os7-sheet {border-radius:28px;padding:0 20px 24px;animation:none;will-change:transform;box-shadow:0 12px 36px rgb(0 0 0 / 14%);max-height:calc(100% - 58px)}
+.os7-preview .os7-sheet>.sheet-handle {width:100%;height:28px;margin:0;position:relative;background:none;cursor:grab;touch-action:none}
+.os7-preview .os7-sheet>.sheet-handle:after {content:"";position:absolute;left:calc(50% - 16px);top:10px;width:32px;height:4px;border-radius:3px;background:color-mix(in srgb,var(--font-primary) 20%,transparent)}
+.os7-preview .os7-sheet header {margin:0 0 16px;min-height:44px;touch-action:none}
+.os7-preview .os7-sheet h2 {font-size:22px;line-height:30px;font-weight:650}
+.os7-preview .os7-sheet header button {min-height:44px;color:var(--os-brand)}
+.os7-preview .os7-search-box {height:48px;border-radius:24px;padding-inline:16px;background:color-mix(in srgb,var(--font-primary) 5%,var(--os-card))}
+.os7-preview .os7-search-box:focus-within {outline:none;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--os-brand) 65%,transparent)}
+.os7-preview .os7-sheet:before,.os7-preview .os7-menu:before {display:none}
+.os7-preview .os7-menu {animation:os7-menu-settle 200ms var(--ease-enter);border-radius:20px}
+@keyframes os7-menu-settle {from{opacity:0;transform:translateY(-4px) scale(.98)}to{opacity:1;transform:none}}
+.os7-preview .os7-overlay.is-closing .os7-sheet {animation:none}
+.os7-preview .os7-overlay .os7-scrim {animation:none;background:rgb(0 0 0 / 24%)}
+.os7-preview .os7-sheet [data-scan-demo] {transition:background 100ms,transform 150ms var(--ease-standard)}
+.os7-preview .os7-sheet [data-scan-demo]:active {transform:scale(.98)}
+.os7-preview .os7-code-preview.scan-complete>svg {color:var(--os-brand)}
+.os7-preview .os7-code-preview.scan-complete {background:color-mix(in srgb,var(--os-brand) 5%,var(--os-card))}
+
+.os7-preview[data-light="weak"] .top-backdrop {background:color-mix(in srgb,var(--os-card) 94%,transparent)}
+.os7-preview[data-light="weak"] .select-page>.top-backdrop {background:color-mix(in srgb,var(--os-card) 96%,transparent)}
+.os7-preview[data-light="off"] .bottom-nav {backdrop-filter:none;-webkit-backdrop-filter:none}
+.os7-preview[data-light="off"] .top-backdrop {height:var(--chrome-height);background:var(--os-card);backdrop-filter:none;-webkit-backdrop-filter:none;mask-image:none;-webkit-mask-image:none}
+.os7-preview[data-light="off"] .select-page>.top-backdrop {background:var(--os-card)}
+.os7-preview[data-motion="reduce"] .channel-tab span,.os7-preview[data-motion="reduce"] .bottom-nav button:active {transform:none}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
+  .os7-preview .top-backdrop {height:var(--chrome-height);background:var(--os-card);mask-image:none;-webkit-mask-image:none}
+  .os7-preview .select-page>.top-backdrop {background:var(--os-card)}
+  .os7-preview .bottom-nav,.os7-preview .os7-sheet,.os7-preview .os7-menu {background:var(--os-card)}
+}
+@media (min-width:761px) {
+  .os7-preview .demo-shell {align-items:flex-start}
+  .os7-preview .phone-stage {position:sticky;top:24px}
+}

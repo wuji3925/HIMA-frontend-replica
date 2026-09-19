@@ -20,6 +20,12 @@
   const originalOrders = new WeakMap();
   let localDraft = '';
   let queuedGrip = null;
+  const springs = new Set();
+  const reduceMotion = () => body.dataset.motion === 'reduce';
+  const makeSpring = (value, render) => {
+    const spring = new HimaSpring(value, render, reduceMotion);
+    springs.add(spring); return spring;
+  };
   const inkFilter = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   inkFilter.setAttribute('width', '0'); inkFilter.setAttribute('height', '0');
   inkFilter.setAttribute('aria-hidden', 'true'); inkFilter.style.position = 'absolute';
@@ -54,6 +60,7 @@
     body.dataset.theme = preferences.theme === 'auto' ? systemTheme.matches ? 'dark' : 'light' : preferences.theme;
     body.dataset.light = preferences.light;
     body.dataset.motion = systemMotion.matches ? 'reduce' : preferences.motion;
+    if (reduceMotion()) [...springs].forEach(spring => spring.finish());
     if (!pointers.size) body.dataset.grip = preferences.grip;
     else queuedGrip = preferences.grip;
     document.querySelectorAll('[data-setting]').forEach(group => {
@@ -87,11 +94,20 @@
   window.addEventListener('pointercancel', release, true);
   window.addEventListener('blur', () => { pointers.clear(); if (queuedGrip) { body.dataset.grip = queuedGrip; queuedGrip = null; } });
 
-  function dismissOverlay() {
+  function dismissOverlay(velocity = 0) {
     const closing = layer;
     if (!closing?.classList.contains('os7-overlay') || body.dataset.motion === 'reduce') { closeLayer(); return; }
     if (closing.classList.contains('is-closing')) return;
     closing.classList.add('is-closing');
+    const sheet = closing.querySelector('.os7-sheet');
+    if (sheet?.motion) {
+      // Keep the sheet interactive: grabbing during exit cancels the dismissal.
+      sheet.motion.to(sheet.offsetHeight + 30, {
+        velocity: typeof velocity === 'number' ? velocity : 0,
+        complete: () => { if (layer === closing) closeLayer(); else closing.remove(); },
+      });
+      return;
+    }
     closing.style.pointerEvents = 'none';
     const duration = closing.querySelector('.os7-menu') ? 180 : 220;
     setTimeout(() => {
@@ -114,22 +130,30 @@
     return layer;
   }
   function openSearch() {
-    const overlay = mountOverlay(`<section class="os7-sheet" role="dialog" aria-modal="true" aria-label="搜索鸿蒙智行内容"><div class="sheet-handle" aria-hidden="true"></div><header><h2>搜索</h2><button data-close>取消</button></header><label class="os7-search-box">${svg('search')}<input type="search" aria-label="搜索内容" placeholder="搜索车型、用车内容" autocomplete="off"></label><div class="os7-search-results" aria-live="polite"></div></section>`, '搜索');
+    const inShop = state.main === 'select';
+    const sourceChannel = inShop ? state.channel.select : 0;
+    const hint = inShop ? '搜索精选商品、软件服务' : '搜索车型、用车内容';
+    const overlay = mountOverlay(`<section class="os7-sheet" role="dialog" aria-modal="true" aria-label="${inShop ? '搜索精选商品' : '搜索鸿蒙智行内容'}"><div class="sheet-handle" aria-hidden="true"></div><header><h2>搜索</h2><button data-close>取消</button></header><label class="os7-search-box">${svg('search')}<input type="search" aria-label="搜索内容" placeholder="${hint}" autocomplete="off"></label><div class="os7-search-results" aria-live="polite"></div></section>`, '搜索');
     const input = overlay.querySelector('input');
     const results = overlay.querySelector('.os7-search-results');
-    const candidates = feedData.map((item, index) => ({ image: item[0], title: item[1], index }));
+    const candidates = inShop ? [...new Map([...activeScroller().querySelectorAll('.product')].map(card => {
+      const title = card.querySelector('p').textContent;
+      return [title, {title, imageUrl:card.querySelector('img').getAttribute('src')}];
+    })).values()] : feedData.map((item, index) => ({ image: item[0], title: item[1], index }));
     function renderResults() {
       const query = input.value.trim().toLowerCase();
       const matches = candidates.filter(item => !query || item.title.toLowerCase().includes(query));
-      results.innerHTML = `<p>${query ? matches.length ? '搜索结果' : '暂无相关内容' : '推荐内容'}</p>`;
+      results.innerHTML = `<p>${query ? matches.length ? '搜索结果' : '暂无相关内容' : inShop ? '精选商品' : '推荐内容'}</p>`;
       matches.slice(0, 4).forEach(item => {
         const button = document.createElement('button'); button.className = 'os7-result';
-        button.innerHTML = `${img(item.image, '')}<span></span>${svg('chevron')}`;
+        button.innerHTML = `<img alt=""><span></span>${svg('chevron')}`;
+        button.querySelector('img').src = item.imageUrl || asset(item.image);
         button.querySelector('span').textContent = item.title;
         button.addEventListener('click', () => {
-          closeLayer(); switchMain('discover'); pages.get('discover').setChannel(0, false);
+          const destination = inShop ? 'select' : 'discover';
+          closeLayer(); switchMain(destination); pages.get(destination).setChannel(sourceChannel, false);
           const panel = activeScroller();
-          const card = [...panel.querySelectorAll('.feed-card')].find(card => card.querySelector('.feed-body>p')?.textContent === item.title);
+          const card = [...panel.querySelectorAll(inShop ? '.product' : '.feed-card')].find(card => card.querySelector(inShop ? 'p' : '.feed-body>p')?.textContent === item.title);
           if (!card) return;
           card.hidden = false;
           const scale = phone.clientWidth / W;
@@ -146,21 +170,58 @@
   }
   function enableSheetDrag(sheet) {
     const handle = sheet.querySelector('.sheet-handle');
-    handle.style.touchAction = 'none';
+    const overlay = sheet.closest('.os7-overlay');
+    const scrim = overlay.querySelector('.os7-scrim');
+    const motion = makeSpring(0, y => {
+      sheet.style.transform = `translate3d(0,${y}px,0)`;
+      scrim.style.opacity = String(1 - Math.min(1, Math.max(0, y) / (sheet.offsetHeight + 30)));
+    });
+    sheet.motion = motion;
+    motion.owner = sheet;
+    motion.jump(reduceMotion() ? 0 : 48);
+    motion.to(0);
     let drag;
-    handle.addEventListener('pointerdown', event => { if (event.button > 0) return; drag = { id: event.pointerId, y: event.clientY, delta: 0 }; handle.setPointerCapture(event.pointerId); });
-    handle.addEventListener('pointermove', event => {
+    sheet.addEventListener('pointerdown', event => {
+      if (event.button > 0 || event.target.closest('button,input,textarea')) return;
+      const inHandle = handle.contains(event.target) || sheet.querySelector('header').contains(event.target);
+      if (!inHandle && (sheet.scrollTop > 0 || event.pointerType === 'mouse')) return;
+      const scale = phone.clientWidth / W;
+      drag = { id:event.pointerId, y:event.clientY / scale, x:event.clientX / scale,
+        start:motion.value, last:event.clientY / scale, time:performance.now(), speed:0, active:inHandle };
+      if (inHandle) {
+        motion.stop(); overlay.classList.remove('is-closing');
+        sheet.setPointerCapture(event.pointerId);
+      }
+    });
+    sheet.addEventListener('pointermove', event => {
       if (!drag || drag.id !== event.pointerId) return;
-      drag.delta = Math.max(0, (event.clientY - drag.y) / (phone.clientWidth / W));
-      sheet.style.transform = `translateY(${drag.delta}px)`;
+      const scale = phone.clientWidth / W, y = event.clientY / scale;
+      const dy = y - drag.y, dx = event.clientX / scale - drag.x;
+      if (!drag.active) {
+        if (Math.abs(dx) > 7 || dy < -7) { drag = null; return; }
+        if (dy < 7) return;
+        drag.active = true; motion.stop(); overlay.classList.remove('is-closing');
+        sheet.setPointerCapture(event.pointerId);
+      }
+      event.preventDefault();
+      const now = performance.now();
+      drag.speed = (y - drag.last) / Math.max(8, now - drag.time);
+      drag.last = y; drag.time = now;
+      const distance = drag.start + dy;
+      motion.jump(distance < 0 ? -24 * (1 - Math.exp(distance / 72)) : distance);
     });
     const end = event => {
       if (!drag || drag.id !== event.pointerId) return;
-      const distance = drag.delta; drag = null;
-      if (event.type !== 'pointercancel' && distance > 72) dismissOverlay();
-      else { sheet.style.transition = 'transform 220ms var(--ease-enter)'; sheet.style.transform = ''; }
+      const last = drag; drag = null;
+      if (!last.active) return;
+      const speed = performance.now() - last.time < 100 ? last.speed : 0;
+      const projected = motion.value + speed * 150;
+      const threshold = Math.min(160, sheet.offsetHeight * .3);
+      if (event.type !== 'pointercancel' && projected > threshold && speed > -.25) dismissOverlay(speed * 1000);
+      else motion.to(0, { velocity:speed * 1000 });
     };
-    handle.addEventListener('pointerup', end); handle.addEventListener('pointercancel', end);
+    sheet.addEventListener('pointerup', end); sheet.addEventListener('pointercancel', end);
+    sheet.addEventListener('lostpointercapture', end);
   }
   function placeMenu(overlay, anchor) {
     const rect = anchor.getBoundingClientRect(), bounds = screen.getBoundingClientRect();
@@ -171,26 +232,6 @@
     enableSheetDrag(overlay.querySelector('.os7-sheet'));
     overlay.querySelector('[data-close]').focus({ preventScroll: true });
     return overlay;
-  }
-  function emitParticles(target) {
-    if (!target || body.dataset.motion === 'reduce' || ['off', 'weak'].includes(body.dataset.light)) return;
-    target.querySelector('.os7-particle-burst')?.remove();
-    target.querySelector('.os7-particle-core')?.remove();
-    const burst = document.createElement('span'); burst.className = 'os7-particle-burst'; burst.setAttribute('aria-hidden', 'true');
-    const colors = ['#0A59F7', '#77A7FF', '#C9DDFF', '#FFFFFF'];
-    for (let index = 0; index < 12; index += 1) {
-      const particle = document.createElement('i'); particle.className = 'os7-particle';
-      const angle = index / 12 * Math.PI * 2; const distance = 34 + index % 3 * 11;
-      particle.style.setProperty('--particle-x', `${Math.cos(angle) * distance}px`);
-      particle.style.setProperty('--particle-y', `${Math.sin(angle) * distance}px`);
-      particle.style.setProperty('--particle-color', colors[index % colors.length]);
-      particle.style.setProperty('--size', `${3 + index % 3}px`);
-      particle.style.setProperty('--delay', `${index % 4 * 14}ms`);
-      burst.append(particle);
-    }
-    const core = document.createElement('span'); core.className = 'os7-particle-core'; core.setAttribute('aria-hidden', 'true');
-    target.append(burst, core);
-    setTimeout(() => { burst.remove(); core.remove(); }, 760);
   }
   function openPublish(anchor) {
     const overlay = mountOverlay(`<div class="os7-menu os7-action-menu" role="menu" aria-label="发布内容"><button role="menuitem" data-compose="图文">${svg('edit')}<span>发布图文</span></button><button role="menuitem" data-compose="视频">${svg('screens')}<span>发布视频</span></button></div>`, '发布内容');
@@ -219,7 +260,7 @@
         const preview = overlay.querySelector('.os7-code-preview');
         preview.querySelector('p').textContent = '演示识别完成 · 鸿蒙智行体验中心';
         overlay.querySelector('[data-scan-demo]').textContent = '重新模拟识别';
-        emitParticles(preview);
+        preview.classList.add('scan-complete');
       });
     } else if (label === '个人二维码') {
       componentSheet('个人二维码', `<div class="os7-code-preview">${svg('qr')}<p>个人名片示意<br>此图标不是可识别二维码</p></div><p class="os7-component-note">仅用于验证弹层样式与交互，未包含账号或身份信息。</p>`);
@@ -247,6 +288,9 @@
     overlay.querySelector('button').focus({ preventScroll: true });
   }
   function bindEnhancements() {
+    for (const spring of springs) {
+      if (spring.owner && !spring.owner.isConnected) { spring.stop(); springs.delete(spring); }
+    }
     screen.querySelectorAll('.main-page,.category-page').forEach(page => {
       if (page.querySelector(':scope > .top-backdrop')) return;
       // A sibling surface can sample scrolling content. A header pseudo-element
@@ -254,16 +298,41 @@
       const backdrop = document.createElement('div'); backdrop.className = 'top-backdrop';
       backdrop.setAttribute('aria-hidden', 'true'); page.append(backdrop);
     });
+    screen.querySelectorAll('.main-page').forEach(page => {
+      if (page.classList.contains('select-page') && !page.querySelector('.os7-page-title')) {
+        const title = document.createElement('h1'); title.className = 'os7-page-title'; title.textContent = '精选';
+        page.querySelector('.title-bar').prepend(title);
+      }
+      if (page.os7Motion || !page.querySelector('.tab-track')) return;
+      const track = page.querySelector('.tab-track');
+      const id = page.classList.contains('select-page') ? 'select' : 'discover';
+      const motion = makeSpring(-state.channel[id] * W, x => {
+        track.style.transform = `translate3d(${x}px,0,0)`;
+      });
+      motion.owner = page;
+      track.style.transition = 'none';
+      page.os7Motion = {
+        position: () => motion.value,
+        grab: () => { motion.stop(); return motion.value; },
+        drag: x => motion.jump(Math.max(-3 * W - 48, Math.min(48, x))),
+        to: (x, interaction, velocity) => interaction === 'instant' ? motion.jump(x) :
+          motion.to(x, { velocity:interaction === 'swipe' ? Math.max(-2500, Math.min(2500, velocity * 1000)) : undefined }),
+      };
+    });
     screen.querySelectorAll('.channel-tabs').forEach(tabs => {
       if (!tabs.dataset.os7Tabs) {
         tabs.dataset.os7Tabs = 'true';
+        tabs.querySelectorAll('.channel-tab').forEach(button => {
+          const label = document.createElement('span'); label.textContent = button.textContent;
+          button.replaceChildren(label);
+        });
         setupHorizontal(tabs);
         tabs.addEventListener('scroll', () => { tabs.dataset.more = String(tabs.scrollLeft + tabs.clientWidth < tabs.scrollWidth - 2); }, { passive: true });
       }
       const selected = tabs.querySelector('[aria-selected="true"]');
       if (tabs.os7Selected !== selected) {
         tabs.os7Selected = selected;
-        // Wait until font-size transitions finish before measuring the active label.
+        // Measure after the selected-label emphasis settles.
         clearTimeout(tabs.os7Measure);
         tabs.os7Measure = setTimeout(() => {
           if (!selected || tabs.closest('.main-page').hidden) return;
@@ -274,14 +343,28 @@
         }, body.dataset.motion === 'reduce' ? 0 : 240);
       }
     });
+    const updateSurface = page => {
+      const scroller = page.querySelector('.tab-panel:not([inert])') || page.querySelector('.plain-scroll,.category-results');
+      if (!scroller) return;
+      const y = Math.max(0, scroller.scrollTop);
+      const t = Math.min(1, y / 120);
+      page.style.setProperty('--os7-scroll', String(t * t * (3 - 2 * t)));
+      page.classList.toggle('os7-scrolled', y > 8);
+    };
+    screen.querySelectorAll('.main-page,.category-page').forEach(page => {
+      if (!page.dataset.os7Surface) {
+        page.dataset.os7Surface = 'true';
+        page.addEventListener('channelchange', () => updateSurface(page));
+      }
+      updateSurface(page);
+    });
     screen.querySelectorAll('.tab-panel,.plain-scroll,.category-results').forEach(scroller => {
       if (scroller.dataset.os7Scroll) return;
       scroller.dataset.os7Scroll = 'true';
       scroller.addEventListener('scroll', () => {
         const page = scroller.closest('.main-page,.category-page');
-        if (!page) return;
-        page.classList.toggle('os7-scrolled', scroller.scrollTop > 8);
-        page.style.setProperty('--os7-scroll', String(Math.min(1, scroller.scrollTop / 72)));
+        if (!page || scroller.inert) return;
+        updateSurface(page);
       }, { passive: true });
     });
     screen.querySelectorAll('.search-field,.header-tools button[aria-label="搜索"],.category-title button[aria-label="搜索"]').forEach(button => {
@@ -310,6 +393,9 @@
     queueMicrotask(() => { scheduled = false; bindEnhancements(); });
   }).observe(screen, { subtree: true, childList: true, attributes: true, attributeFilter: ['hidden', 'aria-selected', 'aria-current'] });
   document.addEventListener('keydown', event => {
+    if (layer?.classList.contains('os7-overlay') && event.key === 'Escape') {
+      event.preventDefault(); event.stopImmediatePropagation(); dismissOverlay(); return;
+    }
     if (!layer || event.key !== 'Tab') return;
     const elements = [...layer.querySelectorAll('button:not([disabled]),input:not([disabled]),textarea:not([disabled]),a[href]')].filter(element => element.getClientRects().length);
     if (!elements.length) return;
