@@ -134,6 +134,7 @@
   }
   function openSearch() {
     const inShop = state.main === 'select';
+    if (inShop && window.HimaRoutes) { if(layer&&!layer.classList.contains('category-page'))closeLayer(); window.HimaRoutes.openSearch(); return; }
     const sourceChannel = inShop ? state.channel.select : 0;
     const hint = inShop ? '搜索精选商品、软件服务' : '搜索车型、用车内容';
     const overlay = mountOverlay(`<section class="os7-sheet" role="dialog" aria-modal="true" aria-label="${inShop ? '搜索精选商品' : '搜索鸿蒙智行内容'}"><div class="sheet-handle" aria-hidden="true"></div><header><h2>搜索</h2><button data-close>取消</button></header><label class="os7-search-box">${svg('search')}<input type="search" aria-label="搜索内容" placeholder="${hint}" autocomplete="off"></label><div class="os7-search-results" aria-live="polite"></div></section>`, '搜索');
@@ -321,6 +322,24 @@
     render();sync();enableSheetDrag(overlay.querySelector('.os7-sheet'));overlay.querySelector('[data-close]').focus({preventScroll:true});
   }
   function bindEnhancements() {
+    screen.querySelectorAll('.discover-page').forEach(page=>{
+      if(page.dataset.deviceStructure)return;page.dataset.deviceStructure='true';
+      const posts=page.querySelector('[data-panel="1"] .posts');
+      if(posts){const wrapper=document.createElement('div');wrapper.innerHTML=feed();const grid=wrapper.firstElementChild;posts.replaceWith(grid);grid.querySelectorAll('.like').forEach(button=>button.addEventListener('click',()=>{const active=button.getAttribute('aria-pressed')!=='true';button.setAttribute('aria-pressed',String(active));const count=button.querySelector('span');if(count)count.textContent=Number(count.textContent)+(active?1:-1);}));}
+      const campaign=page.querySelector('.collection-content');
+      if(campaign){campaign.classList.add('device-campaign');campaign.innerHTML=`${search()}<img class="device-campaign-hero" src="./research/20261102/assets/campaign-hero.png" alt="享界V8 家庭智慧旗舰MPV"><section class="device-campaign-more"><h2>参数配置</h2><p>车型内容展示</p><h2>探索更多</h2></section>`;}
+      const actions=page.querySelector('.collection-actions');if(actions){actions.children[1].textContent='立即预订';actions.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>showToast('预览模式，未提交预约或订单')));}
+    });
+    screen.querySelectorAll('.service-grid').forEach(grid=>{
+      if(grid.dataset.deviceStructure)return;grid.dataset.deviceStructure='true';
+      const labels=['ETC服务','预约服务','道路救援','车险','预约试驾','体验中心','智选购车','金融试算器','我的家充桩','置换服务','尊出行','软件','车主指南'];
+      grid.innerHTML=labels.map((label,index)=>`<button style="--service-color:${index%3?'#43b6dd':'#51c7b6'}">${svg(['book','clock','pin','shield','wheel','cube','car','grid','charger','car','people','grid','book'][index])}<span>${label}</span></button>`).join('');
+    });
+    screen.querySelectorAll('.category-page').forEach(category=>{
+      if(category.dataset.currentCategories)return;category.dataset.currentCategories='true';
+      const titles=['双11','今日上新','R7专属','新车必备','软件服务','充电补能','车内舒适','数码智能','户外出行','影音娱乐','生活周边','儿童呵护'];
+      category.querySelectorAll('.category-body nav button').forEach((button,index)=>button.textContent=titles[index]||'V9专属');
+    });
     screen.querySelectorAll('.brand-options').forEach(options=>{
       if(options.dataset.currentVehicleOrder)return;options.dataset.currentVehicleOrder='true';
       options.querySelectorAll('.brand').forEach((button,index)=>{if(index)button.textContent=vehicleOrder[index-1];});
@@ -428,6 +447,7 @@
     queueMicrotask(() => { scheduled = false; bindEnhancements(); });
   }).observe(screen, { subtree: true, childList: true, attributes: true, attributeFilter: ['hidden', 'aria-selected', 'aria-current'] });
   document.addEventListener('keydown', event => {
+    if(window.HimaRoutes?.active())return;
     if (layer?.classList.contains('os7-overlay') && event.key === 'Escape') {
       event.preventDefault(); event.stopImmediatePropagation(); dismissOverlay(); return;
     }
