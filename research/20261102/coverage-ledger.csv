@@ -1,0 +1,13 @@
+item_id,feature_id,entry_path,scenario,status,evidence,notes
+NAV-01-default,NAV-01,发现推荐,首屏,Tested,NAV-01_01,当前版本已实测
+NAV-01-scroll,NAV-01,发现推荐,上滑吸顶,Tested,NAV-01_02,未测惯性参数
+SEA-01-overlay,SEA-01,发现推荐>车型栏三横线,打开关闭,Tested,SEA-01_02,未修改真实排序
+SEA-01-persist,SEA-01,车型排序,重排持久化,Blocked by dependency,,手机切换其他应用及用户偏好边界
+NAV-02-default,NAV-02,底栏精选,首屏,Tested,NAV-02_01,运营标签仅代表当前采样
+SEA-02-search,SEA-02,精选>搜索,进入及返回,Blocked by dependency,,采样时手机切换其他应用已停止
+DET-01-detail,DET-01,发现>内容详情,详情返回,Blocked by dependency,,等待手机保持目标App
+DET-02-product,DET-02,精选>商品详情,规格及返回,Blocked by dependency,,等待手机保持目标App
+CAR-01-car,CAR-01,爱车,状态及滚动,Blocked by dependency,,当前版本角色待核对
+SVC-01-service,SVC-01,服务,充电维保入口,Blocked by dependency,,等待手机保持目标App
+ACC-01-mine,ACC-01,我的,列表设置帮助,Blocked by dependency,,不采集个人身份信息
+NAV-03-gestures,NAV-03,发现频道,横滑刷新及恢复,Blocked by dependency,,等待连续录屏验证

@@ -2,6 +2,9 @@
 // loaded by index.html. Native sensors/systemMaterial are not invoked by a web page.
 (() => {
   const body = document.body;
+  // Current operational channels observed on device, 3.0.3.300 (2026-11-02).
+  channels.discover[3] = '享界V8';
+  channels.select = ['推荐','双11','今日上新','R7专属'];
   const optionValues = {
     theme: ['light', 'dark', 'auto'],
     light: ['strong', 'balanced', 'weak', 'off'],
@@ -16,8 +19,8 @@
   const systemTheme = matchMedia('(prefers-color-scheme: dark)');
   const systemMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const pointers = new Set();
-  const sorts = new WeakMap();
-  const originalOrders = new WeakMap();
+  const defaultVehicleOrder = ['RX','V8','R7','G9','V800','S800','H5','V9','Z7','Z7T','S9','S9T','S7','M9','M8','M7','M6','M5'];
+  let vehicleOrder = [...defaultVehicleOrder];
   let localDraft = '';
   let queuedGrip = null;
   const springs = new Set();
@@ -267,27 +270,61 @@
     }
   }
   function openSort(anchor) {
-    const panel = activeScroller();
-    const containers = [...panel.querySelectorAll('.feed-column,.posts')];
-    if (!originalOrders.has(panel)) originalOrders.set(panel, containers.map(container => ({ container, children: [...container.children] })));
-    const value = sorts.get(panel) || 'default';
-    const overlay = mountOverlay(`<div class="os7-menu" role="menu" aria-label="内容排序">${[['default', '综合排序'], ['likes', '最多点赞']].map(([id, label]) => `<button role="menuitemradio" aria-checked="${value === id}" data-sort="${id}"><span>${label}</span><span>${value === id ? '✓' : ''}</span></button>`).join('')}</div>`, '内容排序');
-    placeMenu(overlay, anchor);
-    overlay.querySelectorAll('[data-sort]').forEach(button => button.addEventListener('click', () => {
-      const selected = button.dataset.sort; sorts.set(panel, selected);
-      if (selected === 'default') {
-        originalOrders.get(panel).forEach(({ container, children }) => children.forEach(child => container.append(child)));
-      } else {
-        const cards = [...panel.querySelectorAll('.feed-card,.post')];
-        const likes = card => Number(card.querySelector('.like span')?.textContent || (card.querySelector('.like')?.getAttribute('aria-pressed') === 'true' ? 1 : 0));
-        cards.sort((a, b) => likes(b) - likes(a));
-        if (containers.length) cards.forEach((card, index) => containers[index % containers.length].append(card));
-      }
-      closeLayer();
-    }));
-    overlay.querySelector('button').focus({ preventScroll: true });
+    const overlay = mountOverlay(`<section class="os7-sheet vehicle-sort-sheet" role="dialog" aria-modal="true" aria-label="车型排序"><div class="sheet-handle" aria-hidden="true"></div><header><h2>按住拖动排序</h2><button data-close aria-label="关闭车型排序">×</button></header><div class="vehicle-sort-grid" aria-label="车型顺序"></div><button class="vehicle-sort-reset">恢复默认排序</button><p class="sr-only" aria-live="polite" data-order-status></p></section>`, '车型排序');
+    const grid = overlay.querySelector('.vehicle-sort-grid');
+    const sync = () => {
+      screen.querySelectorAll('.brand-options').forEach(options => {
+        const existing = [...options.querySelectorAll('.brand')];
+        const selected = existing.find(b=>b.classList.contains('active'))?.textContent || '全部';
+        const template = existing[1];
+        if (!template) return;
+        const buttons = vehicleOrder.map(name => {
+          let button = existing.find(b=>b.textContent===name);
+          if (!button) { button=template.cloneNode(true); button.textContent=name; button.addEventListener('click',()=>{
+            options.querySelectorAll('.brand').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button));});
+            const index=[...options.children].indexOf(button);
+            options.closest('.tab-panel').querySelectorAll('.feed-card').forEach(card=>card.hidden=index!==0&&Number(card.dataset.brand)!==(index-1)%3);
+            button.scrollIntoView({block:'nearest',inline:'nearest'});
+          }); }
+          button.classList.toggle('active',name===selected);button.setAttribute('aria-pressed',String(name===selected));return button;
+        });
+        options.replaceChildren(existing[0],...buttons);
+      });
+    };
+    const render = () => {grid.replaceChildren(...vehicleOrder.map(name=>{
+      const button=document.createElement('button');button.textContent=name;button.dataset.vehicle=name;
+      button.setAttribute('aria-label',`${name}，按住拖动排序，方向键调整位置`);return button;
+    }));};
+    const move = (name,target) => {
+      const from=vehicleOrder.indexOf(name);if(from<0||target<0||target>=vehicleOrder.length||from===target)return;
+      vehicleOrder.splice(from,1);vehicleOrder.splice(target,0,name);render();sync();
+      overlay.querySelector('[data-order-status]').textContent=`${name} 已移到第 ${target+1} 位`;
+    };
+    let drag;
+    grid.addEventListener('pointerdown',event=>{
+      const button=event.target.closest('[data-vehicle]');if(!button||event.button>0)return;
+      drag={name:button.dataset.vehicle,x:event.clientX,y:event.clientY};button.classList.add('is-dragging');grid.setPointerCapture(event.pointerId);
+    });
+    grid.addEventListener('pointermove',event=>{
+      if(!drag||Math.hypot(event.clientX-drag.x,event.clientY-drag.y)<9)return;
+      event.preventDefault();const target=[...grid.children].find(button=>{const r=button.getBoundingClientRect();return event.clientX>=r.left&&event.clientX<=r.right&&event.clientY>=r.top&&event.clientY<=r.bottom;});
+      if(target)move(drag.name,vehicleOrder.indexOf(target.dataset.vehicle));
+      grid.querySelector(`[data-vehicle="${drag.name}"]`)?.classList.add('is-dragging');
+    });
+    const end=()=>{drag=null;grid.querySelectorAll('.is-dragging').forEach(b=>b.classList.remove('is-dragging'));};
+    grid.addEventListener('pointerup',end);grid.addEventListener('pointercancel',end);
+    grid.addEventListener('keydown',event=>{
+      const name=event.target.dataset.vehicle,delta={ArrowLeft:-1,ArrowRight:1,ArrowUp:-3,ArrowDown:3}[event.key];
+      if(!name||!delta)return;event.preventDefault();move(name,vehicleOrder.indexOf(name)+delta);grid.querySelector(`[data-vehicle="${name}"]`)?.focus();
+    });
+    overlay.querySelector('.vehicle-sort-reset').addEventListener('click',()=>{vehicleOrder=[...defaultVehicleOrder];render();sync();overlay.querySelector('[data-order-status]').textContent='已恢复默认排序';});
+    render();sync();enableSheetDrag(overlay.querySelector('.os7-sheet'));overlay.querySelector('[data-close]').focus({preventScroll:true});
   }
   function bindEnhancements() {
+    screen.querySelectorAll('.brand-options').forEach(options=>{
+      if(options.dataset.currentVehicleOrder)return;options.dataset.currentVehicleOrder='true';
+      options.querySelectorAll('.brand').forEach((button,index)=>{if(index)button.textContent=vehicleOrder[index-1];});
+    });
     for (const spring of springs) {
       if (spring.owner && !spring.owner.isConnected) { spring.stop(); springs.delete(spring); }
     }
@@ -299,10 +336,6 @@
       backdrop.setAttribute('aria-hidden', 'true'); page.append(backdrop);
     });
     screen.querySelectorAll('.main-page').forEach(page => {
-      if (page.classList.contains('select-page') && !page.querySelector('.os7-page-title')) {
-        const title = document.createElement('h1'); title.className = 'os7-page-title'; title.textContent = '精选';
-        page.querySelector('.title-bar').prepend(title);
-      }
       if (page.os7Motion || !page.querySelector('.tab-track')) return;
       const track = page.querySelector('.tab-track');
       const id = page.classList.contains('select-page') ? 'select' : 'discover';
@@ -322,8 +355,9 @@
     screen.querySelectorAll('.channel-tabs').forEach(tabs => {
       if (!tabs.dataset.os7Tabs) {
         tabs.dataset.os7Tabs = 'true';
-        tabs.querySelectorAll('.channel-tab').forEach(button => {
-          const label = document.createElement('span'); label.textContent = button.textContent;
+        tabs.querySelectorAll('.channel-tab').forEach((button,index) => {
+          const label = document.createElement('span');
+          label.textContent = channels[tabs.closest('.select-page')?'select':'discover'][index];
           button.replaceChildren(label);
         });
         setupHorizontal(tabs);
@@ -383,6 +417,7 @@
     });
     screen.querySelectorAll('.filter-tools button[aria-label="内容排序"]').forEach(button => {
       if (button.dataset.os7Sort) return; button.dataset.os7Sort = 'true';
+      button.setAttribute('aria-label','车型排序');
       button.addEventListener('click', () => openSort(button));
     });
     updateReach();

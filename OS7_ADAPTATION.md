@@ -2,6 +2,10 @@
 
 入口：[/os7.html](./os7.html)。原版：[/index.html](./index.html)。
 
+## 2026-11-02 实机纠偏
+
+实机3.0.3.300确认：车型栏三横线为“按住拖动排序”的18车型面板，非文章排序；精选为单行频道，无额外“精选”标题。当前实现已纠偏，09-20双行标题方案由此替代。当前运营频道按采样更新，仅代表该版本/时点。详见[证据与未完成范围](research/20261102/README.md)及[飞书12层适配矩阵](https://wcnmi1hwg5td.feishu.cn/docx/LbHIdk0oco9QEzxFRxMcLtA8nhf)。搜索、详情及其他一级页当前版本仍待实机采样，不将现有网页模拟当作已还原。
+
 新增页复用现有 `reference.js`、`reference.css` 和图片素材；通过仅在新入口加载的 `os7.js`、`os7-motion.js`、`os7.css`、`os7-top.css`、`os7-refinement.css` 增强。`reference.js` 增加了仅在 OS7 挂载时启用的运动接口；原入口仍走原有频道切换和加载路径。手机内部仍采用 392 × 826.667 的等比画布。
 
 ## 2026-09-20 自然交互修订

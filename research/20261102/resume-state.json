@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "session_status": "needs_user",
+  "checkpoint_at": "2026-11-02T16:25:00+08:00",
+  "app": {"name":"鸿蒙智行","package":"app.huawei.motor","version_name":"3.0.3.300","version_code":"300033000"},
+  "environment": {"device_serial":"research-phone","device_model":"PAL-AL00","os_version":"12","account_state":"待核对","industry_profile":"automotive"},
+  "progress": {"discovery_pass":1,"discovery_converged":false,"completed_items":4,"total_discovered_items":12,"last_completed_item_id":"NAV-02-default","next_item_id":"SEA-02-search"},
+  "resume": {"stable_entry_path":"鸿蒙智行>精选","expected_page_cues":["推荐","双11","今日上新","R7专属"],"next_safe_action":"用户将手机停在鸿蒙智行后先核对当前包名，再观察搜索；不得沿用旧坐标点击通知","cleanup_required":false},
+  "files":{"coverage_ledger":"coverage-ledger.csv","handoff":"用户补充体验清单.md"}
+}

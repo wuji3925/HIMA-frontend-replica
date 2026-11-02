@@ -127,3 +127,28 @@
   .os7-preview .demo-shell {align-items:flex-start}
   .os7-preview .phone-stage {position:sticky;top:24px}
 }
+/* 2026-11-02 device correction: the production app has one channel row, no
+   additional Selected heading. Keep the OS7 material treatment independent. */
+.os7-preview .select-page {--chrome-height:98px}
+.os7-preview[data-theme] .select-page .app-header {height:98px}
+.os7-preview .select-page .title-bar {height:60px;display:flex;align-items:center;gap:8px}
+.os7-preview .select-page .channel-tabs {position:static;display:flex;flex:1;min-width:0;gap:16px;overflow-x:auto;scrollbar-width:none}
+.os7-preview .select-page .channel-tab {width:auto;flex:none;font-size:20px!important;line-height:44px;text-align:left}
+.os7-preview .select-page .channel-tab span {transform:scale(.9)}
+.os7-preview .select-page .channel-tab.active span {transform:scale(1)}
+.os7-preview .select-page .header-tools {position:static;flex:none;gap:4px}
+.os7-preview .select-page .tab-panel>.scroll-content {padding-top:98px}
+.os7-preview .select-page.shop-overlay [data-panel="0"]>.scroll-content {padding-top:0}
+.os7-preview .select-page .shop-banner {padding-top:98px}
+.os7-preview .select-page .tab-panel {scroll-padding-top:114px}
+.os7-preview .vehicle-sort-sheet {height:414px;max-height:calc(100% - 100px);left:0;right:0;bottom:0;padding:0 16px 16px;border-radius:28px 28px 0 0;display:flex;flex-direction:column}
+.os7-preview .vehicle-sort-sheet>.sheet-handle {height:12px;flex:none}
+.os7-preview .vehicle-sort-sheet>.sheet-handle:after {display:none}
+.os7-preview .vehicle-sort-sheet header {position:relative;justify-content:center;min-height:48px;margin-bottom:24px;flex:none}
+.os7-preview .vehicle-sort-sheet h2 {font-size:23px;line-height:32px}
+.os7-preview .vehicle-sort-sheet header button {position:absolute;right:0;width:30px;min-height:30px;height:30px;border-radius:50%;font-size:26px;line-height:28px;background:var(--interactive-pressed);color:var(--font-primary)}
+.os7-preview .vehicle-sort-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;touch-action:none;overflow-y:auto}
+.os7-preview .vehicle-sort-grid button {height:30px;border-radius:18px;background:color-mix(in srgb,var(--font-primary) 5%,var(--os-card));font-size:14px;color:var(--font-primary);cursor:grab;user-select:none}
+.os7-preview .vehicle-sort-grid .is-dragging {background:var(--os-brand);color:#fff;transform:scale(1.04);box-shadow:0 4px 12px #0002}
+.os7-preview .vehicle-sort-reset {margin:auto auto 0;width:196px;height:42px;flex:none;border-radius:24px;font-size:18px;font-weight:600;color:var(--os-brand);background:color-mix(in srgb,var(--font-primary) 5%,var(--os-card))}
+.sr-only {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}

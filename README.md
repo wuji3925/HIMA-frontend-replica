@@ -4,6 +4,8 @@
 
 ## 在线预览
 
+2026-11-02 实机首批修订：车型栏三横线改为18车型拖排面板，精选恢复单行频道。[实机证据、覆盖与接续](research/20261102/README.md)。当前全量采样仍未完成。
+
 - [HIMA 前端界面复刻](https://wuji3925.github.io/HIMA-frontend-replica/)
 - [HIMA 沉浸光感适配预览](https://wuji3925.github.io/HIMA-frontend-replica/os7.html)
 
