@@ -321,11 +321,57 @@
     overlay.querySelector('.vehicle-sort-reset').addEventListener('click',()=>{vehicleOrder=[...defaultVehicleOrder];render();sync();overlay.querySelector('[data-order-status]').textContent='已恢复默认排序';});
     render();sync();enableSheetDrag(overlay.querySelector('.os7-sheet'));overlay.querySelector('[data-close]').focus({preventScroll:true});
   }
+  function syncFilterChrome(page,activePanel) {
+    if(!page.os7Filters||page.hidden)return;
+    const scale=page.getBoundingClientRect().width/W;
+    if(!scale)return;
+    const headerHeight=page.querySelector('.app-header').offsetHeight;
+    let docked=false;
+    for(const {panel,row,anchor} of page.os7Filters){
+      const top=(anchor.getBoundingClientRect().top-page.getBoundingClientRect().top)/scale;
+      const pin=panel===activePanel&&top<=headerHeight+.25;
+      if(pin){
+        docked=true;
+        if(!row.classList.contains('is-docked')){
+          anchor.style.height=row.offsetHeight+'px';
+          row.classList.add('is-docked');page.insertBefore(row,page.querySelector('.tab-viewport'));
+        }
+      }else if(row.classList.contains('is-docked')){
+        row.classList.remove('is-docked');anchor.after(row);anchor.style.height='0px';
+      }
+    }
+    page.classList.toggle('has-docked-filter',docked);
+    page.style.setProperty('--chrome-height',(headerHeight+(docked?58:0))+'px');
+  }
   function bindEnhancements() {
     screen.querySelectorAll('.discover-page').forEach(page=>{
       if(page.dataset.deviceStructure)return;page.dataset.deviceStructure='true';
       const posts=page.querySelector('[data-panel="1"] .posts');
       if(posts){const wrapper=document.createElement('div');wrapper.innerHTML=feed();const grid=wrapper.firstElementChild;posts.replaceWith(grid);grid.querySelectorAll('.like').forEach(button=>button.addEventListener('click',()=>{const active=button.getAttribute('aria-pressed')!=='true';button.setAttribute('aria-pressed',String(active));const count=button.querySelector('span');if(count)count.textContent=Number(count.textContent)+(active?1:-1);}));}
+      page.os7Filters=[...page.querySelectorAll('.brand-filter')].map(row=>{
+        const panel=row.closest('.tab-panel'),anchor=document.createElement('div');
+        anchor.className='filter-anchor';anchor.setAttribute('aria-hidden','true');row.before(anchor);row.os7Panel=panel;
+        // The real row is lifted above the shared backdrop only while docked.
+        // Keeping a spacer preserves content, scroll position and existing handlers.
+        row.addEventListener('wheel',event=>{
+          if(!row.classList.contains('is-docked')||Math.abs(event.deltaX)>Math.abs(event.deltaY))return;
+          event.preventDefault();panel.scrollTop+=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?panel.clientHeight:1);
+        },{passive:false});
+        let drag;
+        row.addEventListener('pointerdown',event=>{if(row.classList.contains('is-docked')&&event.button===0)drag={id:event.pointerId,x:event.clientX,y:event.clientY,scroll:panel.scrollTop};});
+        row.addEventListener('pointermove',event=>{
+          if(!drag||drag.id!==event.pointerId)return;
+          const dx=event.clientX-drag.x,dy=event.clientY-drag.y;
+          if(!drag.axis&&Math.hypot(dx,dy)>8)drag.axis=Math.abs(dy)>Math.abs(dx)?'y':'x';
+          if(drag.axis!=='y')return;
+          event.preventDefault();if(!row.hasPointerCapture(event.pointerId))row.setPointerCapture(event.pointerId);
+          panel.scrollTop=drag.scroll-dy/(page.getBoundingClientRect().width/W);
+        });
+        row.addEventListener('click',event=>{if(drag?.axis==='y'){event.preventDefault();event.stopImmediatePropagation();drag=null;}},true);
+        row.addEventListener('pointerup',()=>{if(drag?.axis!=='y')drag=null;});
+        row.addEventListener('pointercancel',()=>drag=null);
+        return {panel,row,anchor};
+      });
       const campaign=page.querySelector('.collection-content');
       if(campaign){campaign.classList.add('device-campaign');campaign.innerHTML=`${search()}<img class="device-campaign-hero" src="./research/20261102/assets/campaign-hero.png" alt="享界V8 家庭智慧旗舰MPV"><section class="device-campaign-more"><h2>参数配置</h2><p>车型内容展示</p><h2>探索更多</h2></section>`;}
       const actions=page.querySelector('.collection-actions');if(actions){actions.children[1].textContent='立即预订';actions.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>showToast('预览模式，未提交预约或订单')));}
@@ -403,6 +449,7 @@
       const t = Math.min(1, y / 120);
       page.style.setProperty('--os7-scroll', String(t * t * (3 - 2 * t)));
       page.classList.toggle('os7-scrolled', y > 8);
+      syncFilterChrome(page,scroller);
     };
     screen.querySelectorAll('.main-page,.category-page').forEach(page => {
       if (!page.dataset.os7Surface) {

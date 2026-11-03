@@ -113,7 +113,7 @@
 .os7-preview .os7-search-box:focus-within {outline:2px solid var(--blue);outline-offset:2px}
 
 /* Content filtering stays a standard solid component, not a row of glass. */
-.os7-preview .brand-filter {top:110px;height:58px;padding-left:12px;align-items:center}
+.os7-preview .brand-filter {top:98px;height:58px;padding-left:12px;align-items:center}
 .os7-preview .brand-options {gap:6px;height:44px;align-items:center}
 .os7-preview .brand {min-width:48px;height:32px;padding:0 10px;border:1px solid var(--os-line);border-radius:18px;background:var(--os-bg);font-size:14px;line-height:30px;transition:color 170ms,background 170ms,transform 170ms}
 .os7-preview .brand.active,.os7-preview[data-theme="dark"] .brand.active {color:#fff;background:#075afa;border-color:#075afa}

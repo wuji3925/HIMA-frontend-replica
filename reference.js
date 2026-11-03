@@ -94,11 +94,11 @@ function createPage(id) {
   page.querySelectorAll('.brand').forEach(button=>button.addEventListener('click',()=>{
     const row=button.closest('.brand-filter'); row.querySelectorAll('.brand').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button));});
     button.scrollIntoView({behavior:reducedMotion?'instant':'smooth',block:'nearest',inline:'nearest'});
-    const panel=button.closest('.tab-panel'); const index=[...button.parentElement.children].indexOf(button);
+    const panel=row.os7Panel||button.closest('.tab-panel'); const index=[...button.parentElement.children].indexOf(button);
     panel.querySelectorAll('.feed-card').forEach(card=>card.hidden=index!==0&&Number(card.dataset.brand)!==(index-1)%3);
   }));
   page.querySelectorAll('[data-layout]').forEach(button=>button.addEventListener('click',()=>{
-    const panel=button.closest('.tab-panel'); const single=panel.classList.toggle('single-layout'); button.innerHTML=svg(single?'single':'grid'); button.setAttribute('aria-pressed',String(single));
+    const panel=button.closest('.brand-filter').os7Panel||button.closest('.tab-panel'); const single=panel.classList.toggle('single-layout'); button.innerHTML=svg(single?'single':'grid'); button.setAttribute('aria-pressed',String(single));
   }));
   page.querySelectorAll('[data-category]').forEach(button=>{if(id==='select') button.addEventListener('click',openCategory);});
   page.querySelectorAll('[data-download]').forEach(button=>button.addEventListener('click',showDownload));
