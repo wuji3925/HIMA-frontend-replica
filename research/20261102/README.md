@@ -4,6 +4,8 @@
 
 [飞书分层清单与鸿蒙7适配研究](https://wcnmi1hwg5td.feishu.cn/docx/LbHIdk0oco9QEzxFRxMcLtA8nhf)已写入指定文件夹并回读确认。
 
+2026-11-03补充：[图片纠错、27张素材来源与逐商品验收](图片纠错记录.md)。
+
 ## 已确认与修订
 
 | 功能ID | 实机观察 | 预览修订 | 证据 |

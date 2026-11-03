@@ -1,0 +1,330 @@
+{
+  "date": "2026-11-02",
+  "appVersion": "3.0.3.300",
+  "items": [
+    {
+      "name": "discover-banner",
+      "source": "NAV-01_04_asset-audit",
+      "crop": {
+        "x": 50,
+        "y": 490,
+        "width": 1076,
+        "height": 605
+      },
+      "role": "发现首屏轮播1",
+      "file": "discover-banner.png"
+    },
+    {
+      "name": "discover-banner-2",
+      "source": "NAV-01_05_banner-second-redacted",
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1076,
+        "height": 605
+      },
+      "role": "发现首屏轮播2，仅保留已裁切的公开活动图片",
+      "file": "discover-banner-2.png"
+    },
+    {
+      "name": "quick-order",
+      "source": "NAV-01_04_asset-audit",
+      "crop": {
+        "x": 56,
+        "y": 1170,
+        "width": 238,
+        "height": 250
+      },
+      "role": "立即定购RX",
+      "file": "quick-order.png"
+    },
+    {
+      "name": "quick-ota",
+      "source": "NAV-01_04_asset-audit",
+      "crop": {
+        "x": 332,
+        "y": 1170,
+        "width": 238,
+        "height": 250
+      },
+      "role": "OTA入口",
+      "file": "quick-ota.png"
+    },
+    {
+      "name": "quick-hot",
+      "source": "NAV-01_04_asset-audit",
+      "crop": {
+        "x": 608,
+        "y": 1170,
+        "width": 238,
+        "height": 250
+      },
+      "role": "双11活动入口",
+      "file": "quick-hot.png"
+    },
+    {
+      "name": "quick-ai",
+      "source": "NAV-01_04_asset-audit",
+      "crop": {
+        "x": 884,
+        "y": 1170,
+        "width": 238,
+        "height": 250
+      },
+      "role": "智能助手",
+      "file": "quick-ai.png"
+    },
+    {
+      "name": "select-banner",
+      "source": "NAV-02_01_select",
+      "crop": {
+        "x": 0,
+        "y": 290,
+        "width": 1176,
+        "height": 886
+      },
+      "role": "精选座椅活动图，不含顶部工具",
+      "file": "select-banner.png"
+    },
+    {
+      "name": "exclusive-r7",
+      "source": "NAV-02_01_select",
+      "crop": {
+        "x": 50,
+        "y": 1251,
+        "width": 342,
+        "height": 342
+      },
+      "role": "R7专属卡",
+      "file": "exclusive-r7.png"
+    },
+    {
+      "name": "exclusive-v9",
+      "source": "NAV-02_01_select",
+      "crop": {
+        "x": 418,
+        "y": 1251,
+        "width": 342,
+        "height": 342
+      },
+      "role": "V9专属卡",
+      "file": "exclusive-v9.png"
+    },
+    {
+      "name": "exclusive-rx",
+      "source": "NAV-02_01_select",
+      "crop": {
+        "x": 786,
+        "y": 1251,
+        "width": 342,
+        "height": 342
+      },
+      "role": "RX专属卡",
+      "file": "exclusive-rx.png"
+    },
+    {
+      "name": "etc-m-thumb",
+      "source": "SEA-02_04_return-results",
+      "crop": {
+        "x": 50,
+        "y": 354,
+        "width": 238,
+        "height": 238
+      },
+      "role": "M系列ETC缩略图",
+      "file": "etc-m-thumb.png"
+    },
+    {
+      "name": "etc-rx-thumb",
+      "source": "SEA-02_04_return-results",
+      "crop": {
+        "x": 50,
+        "y": 718,
+        "width": 238,
+        "height": 238
+      },
+      "role": "RX系列ETC缩略图",
+      "file": "etc-rx-thumb.png"
+    },
+    {
+      "name": "etc-m-hero",
+      "source": "DET-02_01_product",
+      "crop": {
+        "x": 0,
+        "y": 280,
+        "width": 1176,
+        "height": 820
+      },
+      "role": "M系列ETC详情内容，排除导航与原生页码",
+      "file": "etc-m-hero.png"
+    },
+    {
+      "name": "charger-hero",
+      "source": "DET-02_04_charger-image",
+      "crop": {
+        "x": 0,
+        "y": 280,
+        "width": 1176,
+        "height": 820
+      },
+      "role": "家充桩专属主图，保留完整文字宽度",
+      "file": "charger-hero.png"
+    },
+    {
+      "name": "charger-gallery",
+      "source": "DET-02_05_charger-gallery",
+      "crop": {
+        "x": 0,
+        "y": 320,
+        "width": 1176,
+        "height": 780
+      },
+      "role": "同一家充桩原生第7页，仅提取完整服务对照表及脚注，排除工具覆盖的标题区",
+      "file": "charger-gallery.png"
+    },
+    {
+      "name": "charger-thumb",
+      "source": "SEA-03_02_category",
+      "crop": {
+        "x": 338,
+        "y": 478,
+        "width": 225,
+        "height": 225
+      },
+      "role": "家充桩商品缩略图",
+      "file": "charger-thumb.png"
+    },
+    {
+      "name": "mirror-thumb",
+      "source": "SEA-03_02_category",
+      "crop": {
+        "x": 338,
+        "y": 803,
+        "width": 225,
+        "height": 225
+      },
+      "role": "流媒体后视镜商品缩略图",
+      "file": "mirror-thumb.png"
+    },
+    {
+      "name": "charging-gun-thumb",
+      "source": "SEA-03_02_category",
+      "crop": {
+        "x": 338,
+        "y": 1128,
+        "width": 225,
+        "height": 225
+      },
+      "role": "充放电一体枪商品缩略图",
+      "file": "charging-gun-thumb.png"
+    },
+    {
+      "name": "seat-thumb",
+      "source": "SEA-03_02_category",
+      "crop": {
+        "x": 338,
+        "y": 1453,
+        "width": 225,
+        "height": 225
+      },
+      "role": "儿童安全座椅商品缩略图",
+      "file": "seat-thumb.png"
+    },
+    {
+      "name": "cooler-thumb",
+      "source": "SEA-03_02_category",
+      "crop": {
+        "x": 338,
+        "y": 1778,
+        "width": 225,
+        "height": 225
+      },
+      "role": "便携冰箱商品缩略图",
+      "file": "cooler-thumb.png"
+    },
+    {
+      "name": "sunshade-thumb",
+      "source": "SEA-03_02_category",
+      "crop": {
+        "x": 338,
+        "y": 2103,
+        "width": 225,
+        "height": 225
+      },
+      "role": "天窗遮阳帘商品缩略图",
+      "file": "sunshade-thumb.png"
+    },
+    {
+      "name": "car-model",
+      "source": "CAR-01_01_car",
+      "crop": {
+        "x": 50,
+        "y": 320,
+        "width": 1076,
+        "height": 640
+      },
+      "role": "白色M8车模，不含状态数值与控制",
+      "file": "car-model.png"
+    },
+    {
+      "name": "article-thumb",
+      "source": "NAV-01_04_asset-audit",
+      "crop": {
+        "x": 25,
+        "y": 1736,
+        "width": 550,
+        "height": 566
+      },
+      "role": "动态箭头寻车文章缩略图",
+      "file": "article-thumb.png"
+    },
+    {
+      "name": "article-cover",
+      "source": "DET-01_01_article",
+      "crop": {
+        "x": 155,
+        "y": 150,
+        "width": 866,
+        "height": 680
+      },
+      "role": "同篇文章Hero，保留手机与文字气泡，左右排除导航图标",
+      "file": "article-cover.png"
+    },
+    {
+      "name": "article-body",
+      "source": "DET-01_01_article",
+      "crop": {
+        "x": 50,
+        "y": 1807,
+        "width": 1076,
+        "height": 500
+      },
+      "role": "同篇文章正文插图，不含评论工具条",
+      "file": "article-body.png"
+    },
+    {
+      "name": "store",
+      "source": "SVC-01_02_scrolled",
+      "crop": {
+        "x": 50,
+        "y": 290,
+        "width": 1076,
+        "height": 410
+      },
+      "role": "服务门店照片，不含距离地址",
+      "file": "store.png"
+    },
+    {
+      "name": "service-banner",
+      "source": "SVC-01_01_service",
+      "crop": {
+        "x": 50,
+        "y": 440,
+        "width": 1076,
+        "height": 605
+      },
+      "role": "充电服务宣传图",
+      "file": "service-banner.png"
+    }
+  ]
+}
