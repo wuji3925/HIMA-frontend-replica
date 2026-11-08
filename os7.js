@@ -37,6 +37,12 @@
     const id = button.dataset.main;
     button.innerHTML = `${navIcon(id)}<span>${names[id]}</span>`;
   });
+  nav.addEventListener('click',event=>{
+    const button=event.target.closest('[data-main]');
+    if(button?.dataset.main===state.main&&!window.HimaRoutes?.active()){
+      activeScroller()?.scrollTo({top:0,behavior:reduceMotion()?'instant':'smooth'});
+    }
+  },true);
   function updateReferenceLink() {
     const hasChannel = Boolean(channels[state.main]);
     const original = new URL('./index.html', location.href);
@@ -48,6 +54,7 @@
     body.dataset.theme = preferences.theme === 'auto' ? systemTheme.matches ? 'dark' : 'light' : preferences.theme;
     body.dataset.light = preferences.light;
     body.dataset.motion = systemMotion.matches ? 'reduce' : preferences.motion;
+    updateGuide();
     if (reduceMotion()) [...springs].forEach(spring => spring.finish());
     document.querySelectorAll('[data-setting]').forEach(group => {
       group.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.value === preferences[group.dataset.setting])));
@@ -261,7 +268,8 @@
           if (!button) { button=template.cloneNode(true); button.textContent=name; button.addEventListener('click',()=>{
             options.querySelectorAll('.brand').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button));});
             const index=[...options.children].indexOf(button);
-            options.closest('.tab-panel').querySelectorAll('.feed-card').forEach(card=>card.hidden=index!==0&&Number(card.dataset.brand)!==(index-1)%3);
+            const panel=options.closest('.brand-filter').os7Panel||options.closest('.tab-panel');
+            panel.querySelectorAll('.feed-card').forEach(card=>card.hidden=index!==0&&Number(card.dataset.brand)!==(index-1)%3);
             button.scrollIntoView({block:'nearest',inline:'nearest'});
           }); }
           button.classList.toggle('active',name===selected);button.setAttribute('aria-pressed',String(name===selected));return button;

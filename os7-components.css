@@ -1,0 +1,158 @@
+/* HarmonyOS component-style translation, 2026-11-08.
+   Source-backed: floating Tabs 56vp, >=40vp hit targets, Sheet/Dialog 32vp.
+   px approximate vp inside the fixed demo canvas. Other tokens are project
+   choices, not exported HDS resources. See COMPONENT_STYLE_REVIEW.md. */
+.os7-preview {
+  --os-muted:#60646c;--font-secondary:var(--os-muted);
+  --component-radius:16px;--sheet-radius:32px;--control-hit:40px;
+  --demo-safe-bottom:28px;--tab-height:56px;
+  --control-fill:color-mix(in srgb,var(--font-primary) 5%,var(--os-card));
+}
+.os7-preview[data-theme="dark"] {--os-muted:#b5b8c0;--font-secondary:var(--os-muted)}
+.os7-preview .screen button:focus-visible,.os7-preview .screen summary:focus-visible {
+  outline:2px solid var(--os-brand);outline-offset:2px;
+}
+.os7-preview .screen:before {
+  content:"";position:absolute;z-index:140;pointer-events:none;
+  bottom:8px;left:calc(50% - 54px);width:108px;height:4px;border-radius:2px;
+  background:var(--font-primary);opacity:.7;
+}
+.os7-preview .bottom-nav {
+  left:16px;right:16px;bottom:var(--demo-safe-bottom);width:auto;
+  height:var(--tab-height);border-radius:28px;padding:0 8px;
+}
+.os7-preview .bottom-nav button {min-height:40px;padding:4px 0;gap:2px;font-size:10px;justify-content:center}
+.os7-preview .bottom-nav .nav-glyph {width:24px;height:24px}
+.os7-preview .tab-panel>.scroll-content,.os7-preview .plain-scroll>.scroll-content {
+  padding-bottom:112px;
+}
+.os7-preview .app-header .title-bar>h1 {font-size:22px;font-weight:650;line-height:30px}
+.os7-preview .channel-tab {min-width:40px}
+.os7-preview .car-page .title-bar>h1 {font-size:18px}
+.os7-preview .header-tools .icon-button,.os7-preview .category-title>.icon-button,
+.os7-preview .filter-tools .icon-button {min-width:40px;min-height:40px}
+.os7-preview .brand {height:40px;min-width:48px;line-height:38px;border-color:transparent}
+.os7-preview .brand.active {background:var(--os-brand);border-color:transparent;color:#fff}
+.os7-preview[data-theme="dark"] .brand.active {color:#102448;background:var(--os-brand)}
+.os7-preview .search-field,.os7-preview .os7-search-box,.os7-preview .replica-query {
+  min-height:44px;border:0;border-radius:22px;box-shadow:none;
+  background:var(--control-fill);color:var(--font-secondary);
+}
+.os7-preview .replica-query input {font-size:16px}
+.os7-preview .replica-query>button {height:40px;min-width:44px;border-left:0;padding-left:8px}
+.os7-preview .replica-route-bar>button {width:40px;height:40px;min-width:40px}
+.os7-preview .replica-route:has(.replica-product-body) .replica-route-bar>button {width:40px;height:40px}
+.os7-preview .replica-hot-tags button,.os7-preview .replica-history button {
+  min-height:40px;min-width:40px;padding:8px 12px;border-radius:20px;
+}
+.os7-preview .section-title {font-size:18px;font-weight:600;line-height:28px;min-height:40px}
+.os7-preview .section-title .more {min-height:40px;min-width:40px;display:flex;align-items:center;justify-content:flex-end;color:var(--font-secondary)}
+.os7-preview .feed-card,.os7-preview .topics-card,.os7-preview .activity,
+.os7-preview .profile,.os7-preview .shortcuts>button,.os7-preview .settings-list,
+.os7-preview .charging-card,.os7-preview .maintenance,.os7-preview .store,
+.os7-preview .service-grid,.os7-preview .info-grid section {
+  border-radius:var(--component-radius);background:var(--os-card);color:var(--font-primary);
+}
+.os7-preview .feed-meta,.os7-preview .feed-meta>span,.os7-preview .feed-meta .like,
+.os7-preview .shortcuts small,.os7-preview .charging-actions button,.os7-preview .service-grid button,
+.os7-preview .control>span,.os7-preview .car-caption,.os7-preview .info-grid small,
+.os7-preview .maintenance small,.os7-preview .store p,.os7-preview .settings-item>span>small {
+  color:var(--font-secondary);
+}
+.os7-preview .feed-card .like {min-height:40px;min-width:40px;justify-content:flex-end}
+.os7-preview .feed-meta {min-height:40px;gap:4px}
+.os7-preview .feed-meta>span {min-width:0}
+.os7-preview .feed-body {padding-bottom:4px}
+.os7-preview .feed-meta b,.os7-preview .profile-top p b {background:#0a59f7;color:white}
+.os7-preview[data-theme="dark"] .feed-meta b,.os7-preview[data-theme="dark"] .profile-top p b {background:var(--os-brand);color:#102448}
+.os7-preview .topics-card>button {height:40px;min-height:40px}
+.os7-preview .activity footer>button {height:40px;min-width:80px;padding-inline:12px;border-radius:20px;background:var(--control-fill);color:var(--os-brand)}
+.os7-preview .settings-list {padding:0 16px}
+.os7-preview .settings-item {min-height:64px;gap:16px}
+.os7-preview .settings-item>span {font-size:16px;line-height:24px}
+.os7-preview .settings-item>svg:first-child {width:24px;height:24px;color:var(--font-primary)}
+.os7-preview .settings-item>svg:last-child {color:var(--font-secondary)}
+.os7-preview .settings-item:after {left:40px;background:var(--os-line);height:.5px}
+.os7-preview .mine-content {background:var(--os-bg);padding-inline:16px}
+.os7-preview .profile {height:auto;min-height:158px}
+.os7-preview .profile .stats button {min-height:44px}
+.os7-preview .profile .stats span {color:var(--font-secondary);font-size:12px}
+.os7-preview .shortcuts {gap:12px}
+.os7-preview .shortcuts>button {height:80px;padding:16px}
+.os7-preview .shortcuts small {font-size:12px;line-height:18px;max-width:118px}
+.os7-preview .shortcuts i {right:12px}
+.os7-preview .charging-actions {height:88px}
+.os7-preview .charging-actions button {min-height:64px;font-size:12px;gap:8px}
+.os7-preview .charging-actions button:after {display:none}
+.os7-preview .service-grid {padding:16px;gap:16px 8px}
+.os7-preview .service-grid button {min-height:64px;font-size:12px}
+.os7-preview .service-grid svg {width:24px;height:24px}
+.os7-preview .maintenance {height:96px;padding:20px 16px}
+.os7-preview .maintenance strong {font-size:16px}
+.os7-preview .store>div {padding:16px 64px 16px 16px}
+.os7-preview .store strong {white-space:normal;line-height:24px;display:block}
+.os7-preview .store p {line-height:18px}
+.os7-preview .store button {min-width:44px;min-height:44px}
+.os7-preview .climate header>button,.os7-preview .temperature>button {width:40px;height:40px;min-width:40px;min-height:40px}
+.os7-preview .climate {height:180px}
+.os7-preview .temperature {margin:20px 0 4px}
+.os7-preview .info-stack section {height:84px}
+.os7-preview .control {min-height:88px}
+.os7-preview .car-placeholder [data-download] {min-height:40px;padding:0 12px;font-size:14px}
+.os7-preview .car-top {min-height:44px;align-items:center}
+.os7-preview .charge-pill {min-height:40px;padding:0 12px;border-radius:20px;font-size:12px}
+.os7-preview .door-pill,.os7-preview .range p,.os7-preview .car-caption,.os7-preview .charge-pill {color:var(--font-primary)}
+.os7-preview .control b {width:56px;height:56px}
+.os7-preview .control.selected b {background:var(--os-brand);color:white}
+.os7-preview[data-theme="dark"] .control.selected b {color:#102448}
+.os7-preview .category-body>nav {width:104px}
+.os7-preview .category-body>nav>button {font-size:14px;min-height:56px;padding:8px}
+.os7-preview .category-body>nav>button.active {color:var(--os-brand);background:var(--os-card)}
+.os7-preview .category-body>nav>button.active:before {background:var(--os-brand);border-radius:2px}
+.os7-preview .category-results .products {border-radius:16px;padding:16px 12px}
+.os7-preview .category-results .product {grid-template-columns:76px minmax(0,1fr);gap:4px 12px}
+.os7-preview .category-results .product>img {width:76px;height:76px}
+.os7-preview .category-results .product>p {font-size:14px;line-height:20px}
+.os7-preview .category-results .product>span {font-size:14px}
+.os7-preview .os7-sheet {left:0;right:0;bottom:0;border:0;border-radius:32px 32px 0 0;padding-bottom:calc(20px + var(--demo-safe-bottom))}
+.os7-preview .os7-sheet header {min-height:48px;gap:8px}
+.os7-preview .os7-sheet h2 {font-size:20px;line-height:28px}
+.os7-preview .os7-sheet [data-close] {min-width:40px;min-height:40px}
+.os7-preview .vehicle-sort-sheet {height:500px;padding-inline:16px}
+.os7-preview .vehicle-sort-sheet header {margin-bottom:16px}
+.os7-preview .vehicle-sort-sheet header button {width:40px;height:40px;min-height:40px}
+.os7-preview .vehicle-sort-grid button {height:40px;font-size:14px;border-radius:20px;box-shadow:none}
+.os7-preview .vehicle-sort-reset {height:40px;margin-top:20px;font-size:16px}
+.os7-preview .os7-menu {border-radius:20px;padding:4px 8px;border:0}
+.os7-preview .os7-menu button {height:48px;border-radius:12px;font-size:16px}
+.os7-preview .os7-component-primary,.os7-preview .replica-purchase>button,
+.os7-preview .replica-buy-confirm,.os7-preview .vehicle-sort-reset {height:40px;min-height:40px;border-radius:20px;font-size:16px;font-weight:600}
+.os7-preview .resource-sheet {left:16px;right:16px;top:50%;bottom:auto;transform:translateY(-50%);height:auto;padding:24px 16px 16px;border:0;border-radius:32px;animation:none}
+.os7-preview .resource-sheet>p {font-size:20px;font-weight:600;line-height:28px;margin-bottom:16px}
+.os7-preview .resource-sheet>div {margin-top:0;gap:8px}
+.os7-preview .resource-sheet button {min-width:0;flex:1;height:40px;border-radius:20px;font-size:16px;color:var(--os-brand);background:var(--control-fill)}
+.os7-preview .resource-sheet>div>button+button {border-left:0;background:#0a59f7;color:white}
+.os7-preview .replica-spec {height:auto;min-height:480px;padding:24px 16px calc(20px + var(--demo-safe-bottom));border-radius:32px 32px 0 0;gap:0}
+.os7-preview .replica-spec-close {width:40px;height:40px;right:12px;top:12px;line-height:40px}
+.os7-preview .replica-spec-heading {padding-right:40px;min-height:88px}
+.os7-preview .replica-selected {margin:16px 0}
+.os7-preview .replica-sku {min-height:40px;min-width:80px;border-radius:20px;padding:8px 16px}
+.os7-preview .replica-buy-confirm {margin-top:20px}
+.os7-preview .os7-component-primary,.os7-preview .replica-purchase>button,.os7-preview .replica-buy-confirm {background:var(--os-brand);color:white}
+.os7-preview[data-theme="dark"] .os7-component-primary,.os7-preview[data-theme="dark"] .replica-purchase>button,.os7-preview[data-theme="dark"] .replica-buy-confirm {color:#102448}
+.os7-preview .replica-product-result {min-height:104px;gap:16px}
+.os7-preview .replica-fact {min-height:64px;padding:16px 0}
+.os7-preview .replica-purchase {height:92px!important;padding-bottom:var(--demo-safe-bottom)!important}
+.os7-preview .replica-product-body {bottom:92px}
+.os7-preview .replica-article-actions {height:84px;padding:8px 16px var(--demo-safe-bottom);gap:4px}
+.os7-preview .replica-article-actions>button {min-width:40px;min-height:40px;justify-content:center}
+.os7-preview .replica-article-actions .replica-write {font-size:14px;text-align:left;justify-content:flex-start;padding-inline:12px}
+.os7-preview .replica-article-scroll {bottom:84px}
+.os7-preview .replica-author button {min-width:72px;min-height:40px;border-radius:20px}
+.os7-preview .collection-actions {left:16px;right:16px;bottom:96px;height:72px;padding:16px;gap:8px;border-radius:16px;background:var(--os-card)}
+.os7-preview .collection-actions button {height:40px;border-radius:20px;font-size:16px;padding:0 16px;color:var(--font-primary);border-color:var(--os-line)}
+.os7-preview .collection-actions button:last-child {flex:1;background:var(--os-brand);border-color:transparent;color:white}
+.os7-preview[data-theme="dark"] .collection-actions button:last-child {color:#102448}
+.os7-preview .replica-comment-form {border-radius:32px 32px 0 0;padding-bottom:calc(16px + var(--demo-safe-bottom))}
+.os7-preview .replica-comment-form button {min-width:64px;min-height:40px}
+.os7-preview .toast {bottom:108px;font-size:14px;line-height:20px;max-width:calc(100% - 64px);padding:12px 20px;border-radius:24px}

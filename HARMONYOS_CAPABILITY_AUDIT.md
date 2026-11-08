@@ -6,6 +6,8 @@
 
 本仓库没有.ets、oh-package.json5、build-profile.json5及原生桥接；package.json仅有静态网页启动命令；入口加载reference/os7系列浏览器脚本。
 
+[逐页组件样式整改及前后截图](COMPONENT_STYLE_REVIEW.md)。官方样式的网页转译与原生接入是两个维度。
+
 ## 特性清单
 
 | ID / 特性 | 当前状态 | 实际实现与位置 | 依据与处理 |
@@ -19,7 +21,7 @@
 | F07 / 智感握姿 | 已撤下无依据演示 | 此前是手动选择左右手并水平移动底栏，未读取传感器。 os7.html、os7.js、os7.css 的旧grip分支已移除 | 移除握姿开关、自绘辅助频道条及底栏迁移。旧URL的grip参数被忽略并移除；待原生方案与证据齐备后另行设计。 依据：S3 |
 | F08 / 设备算力与材质等级自适应 | 未接入 | 仅有CSS @supports不支持背景滤镜时的实体降级，透明度开关由用户手动选择。 os7.css；os7-refinement.css | 手动透明度不等于系统强/均衡/弱档，不读取uiMaterial.getGlobalMaterialLevel或hdsMaterial.getSystemMaterialTypes。 依据：S1、S2 |
 | F09 / 鸿蒙黑体与系统语义资源 | 未接入 | font-family仅列出HarmonyOS Sans候选并回退系统字体；颜色与间距是项目CSS值。 reference.css；os7.css；os7-refinement.css | 没有随包字体、@font-face或系统$r资源调用；不能声称所有设备实际使用鸿蒙黑体、官方Token或已达官方对比度标准。 依据：代码核验 |
-| F10 / MiniBar与多设备原生适配 | 未实现 | 固定392×826.667画布缩放与网页媒体查询。 reference.js；reference.css；os7-refinement.css | 未实现持续任务MiniBar、折叠态监听、原生安全区或多设备系统导航；手机比例展示不能当作这些能力的验收。 依据：代码核验 |
+| F10 / MiniBar与多设备原生适配 | 未实现 | 固定392×826.667画布缩放、网页媒体查询与28px底部避让示意；不是系统避让接口。 reference.js；reference.css；os7-refinement.css | 未实现持续任务MiniBar、折叠态监听、原生安全区或多设备系统导航；手机比例展示不能当作这些能力的验收。 依据：代码核验 |
 
 ## 组件清单
 
@@ -27,18 +29,18 @@
 
 | ID / 组件 | 实际网页实现 | 代码位置 | 原生映射的真实状态 |
 | --- | --- | --- | --- |
-| C01 / 状态栏与顶部导航 | HTML header、固定时间文本、截图状态图标和CSS背景。 | reference.js / status、createPage；os7.js / syncFilterChrome | HdsNavigation或Navigation/NavDestination（未来选型，当前未接入） 依据：S1、S2 |
-| C02 / 底部一级导航 | HTML nav/button、自绘SVG和CSS悬浮背景。 | reference.js / navIcon；os7.js；os7.css | HdsTabs（未来选型，当前未接入） 依据：S2 |
-| C03 / 顶部频道与车型筛选 | HTML按钮、ARIA tab、横向滚动、CSS选中态及JS吸顶。 | reference.js / brands、setupChannels；os7.js / syncFilterChrome | 未选型；通用导航和业务筛选，不是鸿蒙专属组件 依据：代码核验 |
-| C04 / 卡片、列表、宫格、分类分栏 | HTML article/div、CSS grid/flex与overflow滚动。 | reference.js / feed、shop、openCategory；os7-media.js | 业务结构，尚未实施原生组件选型 依据：代码核验 |
-| C05 / 搜索与搜索结果 | HTML form/input/button；精选为独立网页路由，发现为自定义面板。 | os7-routes.js / openSearch、results；os7.js / openSearch | 未接入原生搜索组件；不能因外形相似计为已使用 依据：代码核验 |
-| C06 / 详情、返回与路由栈 | HTML section与浏览器history、popstate、inert。 | os7-routes.js / route、popTo、refresh | Navigation/NavDestination（未来选型，当前未接入） 依据：S1 |
-| C07 / 半模态：规格、搜索、车型排序 | DOM遮罩、role=dialog、CSS定位、自定义拖拽；不同面板未统一具备同等拖拽行为。 | os7-routes.js / openSpec；os7.js / componentSheet、openSort、enableSheetDrag | ArkUI半模态转场（未来选型，当前未接入） 依据：S1 |
-| C08 / 发布菜单 | HTML自定义菜单与按钮，CSS入场。 | os7.js / openTopAction；os7-refinement.css | ArkUI菜单控制（未来选型，当前未接入） 依据：S1 |
-| C09 / 对话层与Toast | DOM section/div、遮罩和role=status；没有native弹窗调用。 | reference.js / showDownload、showToast；os7-top.css | AlertDialog/CustomDialog/PromptAction为官方可用路径，当前未选型接入 依据：S1 |
-| C10 / 按钮、开关、文本与图标 | HTML button/input、ARIA状态、系统回退字体、SVG与截图资源。 | os7.html；reference.js；os7-routes.js | 未使用ArkUI Button/Toggle/Text/SymbolGlyph；普通网页控件不能计入 依据：代码核验 |
-| C11 / 商品图集与文章图片 | HTML img与横向overflow、scroll-snap。 | os7-routes.js / product、article；os7-routes.css | 业务内容展示，尚未实施原生组件选型 依据：代码核验 |
-| C12 / 消息、扫码、评论与交易状态 | 本地演示消息、模拟识别、评论草稿与购买演示边界。 | os7.js / openTopAction；os7-routes.js / article、openSpec | 没有接入Push Kit、Scan Kit、真实发布或支付服务 依据：代码核验 |
+| C01 / 状态栏与顶部导航 | HTML header、固定时间文本、截图状态图标和CSS背景。 | reference.js / status、createPage；os7.js / syncFilterChrome；os7-components.css（样式） | HdsNavigation或Navigation/NavDestination（未来选型，当前未接入） 依据：S1、S2 |
+| C02 / 底部一级导航 | HTML nav/button、自绘SVG和CSS悬浮背景。 | reference.js / navIcon；os7.js；os7.css；os7-components.css（样式） | HdsTabs（未来选型，当前未接入） 依据：S2 |
+| C03 / 顶部频道与车型筛选 | HTML按钮、ARIA tab、横向滚动、CSS选中态及JS吸顶。 | reference.js / brands、setupChannels；os7.js / syncFilterChrome；os7-components.css（样式） | 未选型；通用导航和业务筛选，不是鸿蒙专属组件 依据：代码核验 |
+| C04 / 卡片、列表、宫格、分类分栏 | HTML article/div、CSS grid/flex与overflow滚动。 | reference.js / feed、shop、openCategory；os7-media.js；os7-components.css（样式） | 业务结构，尚未实施原生组件选型 依据：代码核验 |
+| C05 / 搜索与搜索结果 | HTML form/input/button；精选为独立网页路由，发现为自定义面板。 | os7-routes.js / openSearch、results；os7.js / openSearch；os7-components.css（样式） | 未接入原生搜索组件；不能因外形相似计为已使用 依据：代码核验 |
+| C06 / 详情、返回与路由栈 | HTML section与浏览器history、popstate、inert。 | os7-routes.js / route、popTo、refresh；os7-components.css（样式） | Navigation/NavDestination（未来选型，当前未接入） 依据：S1 |
+| C07 / 半模态：规格、搜索、车型排序 | DOM遮罩、role=dialog、CSS定位、自定义拖拽；不同面板未统一具备同等拖拽行为。 | os7-routes.js / openSpec；os7.js / componentSheet、openSort、enableSheetDrag；os7-components.css（样式） | ArkUI半模态转场（未来选型，当前未接入） 依据：S1 |
+| C08 / 发布菜单 | HTML自定义菜单与按钮，CSS入场。 | os7.js / openTopAction；os7-refinement.css；os7-components.css（样式） | ArkUI菜单控制（未来选型，当前未接入） 依据：S1 |
+| C09 / 对话层与Toast | DOM section/div、遮罩和role=status；没有native弹窗调用。 | reference.js / showDownload、showToast；os7-top.css；os7-components.css（样式） | AlertDialog/CustomDialog/PromptAction为官方可用路径，当前未选型接入 依据：S1 |
+| C10 / 按钮、开关、文本与图标 | HTML button/input、ARIA状态、系统回退字体、SVG与截图资源。 | os7.html；reference.js；os7-routes.js；os7-components.css（样式） | 未使用ArkUI Button/Toggle/Text/SymbolGlyph；普通网页控件不能计入 依据：代码核验 |
+| C11 / 商品图集与文章图片 | HTML img与横向overflow、scroll-snap。 | os7-routes.js / product、article；os7-routes.css；os7-components.css（样式） | 业务内容展示，尚未实施原生组件选型 依据：代码核验 |
+| C12 / 消息、扫码、评论与交易状态 | 本地演示消息、模拟识别、评论草稿与购买演示边界。 | os7.js / openTopAction；os7-routes.js / article、openSpec；os7-components.css（样式） | 没有接入Push Kit、Scan Kit、真实发布或支付服务 依据：代码核验 |
 
 ## 官方依据
 
