@@ -125,7 +125,7 @@
 .os7-preview .category-title {gap:10px;padding-inline:14px}
 .os7-preview .category-title>[data-back] {width:44px;height:44px;border-radius:50%;background:none}
 
-/* New top action demos reuse THICK menus and ULTRA_THICK sheets. */
+/* Local CSS menu and sheet styles, not native component instances. */
 .os7-preview .os7-menu {transform-origin:calc(100% - 22px) 0}
 .os7-preview .os7-action-menu button {gap:12px;justify-content:flex-start}
 .os7-preview .os7-action-menu button svg {width:20px;height:20px}

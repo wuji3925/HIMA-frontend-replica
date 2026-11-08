@@ -8,21 +8,18 @@
   const optionValues = {
     theme: ['light', 'dark', 'auto'],
     light: ['strong', 'balanced', 'weak', 'off'],
-    grip: ['left', 'both', 'right'],
     motion: ['full', 'reduce'],
   };
   const url = new URL(location.href);
-  const preferences = { theme: 'light', light: 'balanced', grip: 'both', motion: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduce' : 'full' };
+  const preferences = { theme: 'light', light: 'balanced', motion: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduce' : 'full' };
   for (const key of Object.keys(preferences)) {
     if (optionValues[key].includes(url.searchParams.get(key))) preferences[key] = url.searchParams.get(key);
   }
   const systemTheme = matchMedia('(prefers-color-scheme: dark)');
   const systemMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  const pointers = new Set();
   const defaultVehicleOrder = ['RX','V8','R7','G9','V800','S800','H5','V9','Z7','Z7T','S9','S9T','S7','M9','M8','M7','M6','M5'];
   let vehicleOrder = [...defaultVehicleOrder];
   let localDraft = '';
-  let queuedGrip = null;
   const springs = new Set();
   const reduceMotion = () => body.dataset.motion === 'reduce';
   const makeSpring = (value, render) => {
@@ -40,20 +37,8 @@
     const id = button.dataset.main;
     button.innerHTML = `${navIcon(id)}<span>${names[id]}</span>`;
   });
-  const reach = document.createElement('nav');
-  reach.className = 'reach-toolbar';
-  reach.setAttribute('aria-label', '单手频道操作');
-  reach.innerHTML = `<button aria-label="单手上一频道">${svg('chevron')}</button><button aria-label="单手下一频道">${svg('chevron')}</button>`;
-  screen.append(reach);
-  reach.children[0].addEventListener('click', () => pages.get(state.main)?.setChannel?.(state.channel[state.main] - 1));
-  reach.children[1].addEventListener('click', () => pages.get(state.main)?.setChannel?.(state.channel[state.main] + 1));
-
-  function updateReach() {
+  function updateReferenceLink() {
     const hasChannel = Boolean(channels[state.main]);
-    const hideReach = !hasChannel || state.main === 'discover' && state.channel.discover === 3;
-    if (reach.hidden !== hideReach) reach.hidden = hideReach;
-    reach.children[0].disabled = !hasChannel || state.channel[state.main] === 0;
-    reach.children[1].disabled = !hasChannel || state.channel[state.main] === 3;
     const original = new URL('./index.html', location.href);
     original.searchParams.set('page', state.main);
     if (hasChannel) original.searchParams.set('channel', state.channel[state.main]);
@@ -64,17 +49,17 @@
     body.dataset.light = preferences.light;
     body.dataset.motion = systemMotion.matches ? 'reduce' : preferences.motion;
     if (reduceMotion()) [...springs].forEach(spring => spring.finish());
-    if (!pointers.size) body.dataset.grip = preferences.grip;
-    else queuedGrip = preferences.grip;
     document.querySelectorAll('[data-setting]').forEach(group => {
       group.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.value === preferences[group.dataset.setting])));
     });
     document.querySelector('#reduceMotion').checked = body.dataset.motion === 'reduce';
     document.querySelector('#reduceMotion').disabled = systemMotion.matches;
     const current = new URL(location.href);
+    // Legacy research links remain usable; unsupported grip controls are retired.
+    current.searchParams.delete('grip');
     for (const [key, value] of Object.entries(preferences)) current.searchParams.set(key, value);
     history.replaceState({}, '', current);
-    updateReach();
+    updateReferenceLink();
   }
   document.querySelectorAll('[data-setting]').forEach(group => group.addEventListener('click', event => {
     const button = event.target.closest('[data-value]');
@@ -88,14 +73,6 @@
   });
   systemTheme.addEventListener('change', applyPreferences);
   systemMotion.addEventListener('change', applyPreferences);
-  window.addEventListener('pointerdown', event => pointers.add(event.pointerId), true);
-  function release(event) {
-    pointers.delete(event.pointerId);
-    if (!pointers.size && queuedGrip) { body.dataset.grip = queuedGrip; queuedGrip = null; }
-  }
-  window.addEventListener('pointerup', release, true);
-  window.addEventListener('pointercancel', release, true);
-  window.addEventListener('blur', () => { pointers.clear(); if (queuedGrip) { body.dataset.grip = queuedGrip; queuedGrip = null; } });
 
   function dismissOverlay(velocity = 0) {
     const closing = layer;
@@ -486,7 +463,7 @@
       button.setAttribute('aria-label','车型排序');
       button.addEventListener('click', () => openSort(button));
     });
-    updateReach();
+    updateReferenceLink();
   }
   let scheduled = false;
   new MutationObserver(() => {

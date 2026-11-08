@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-08",
+  "scope": "os7.html 当前网页，不包括原生App或历史设计探索",
+  "conclusion": "原生 ArkUI/HDS 组件接入为0；现有页面由 HTML、CSS、JavaScript 实现。官方能力名称真实存在，网页效果仅为参考方向或通用交互，不能计为系统能力已接入。",
+  "evidence": "本仓库没有.ets、oh-package.json5、build-profile.json5及原生桥接；package.json仅有静态网页启动命令；入口加载reference/os7系列浏览器脚本。",
+  "sources": [
+    {"id":"S1","title":"华为：沉浸光感简介","url":"https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/arkts-immersive-light-sense-overview","verified":"2026-11-08取得正文，确认API 26.0.0、五级材质、系统自适应、空间动效及组件生效范围。"},
+    {"id":"S2","title":"华为：UI Design Kit沉浸光感","url":"https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ui-design-hds-component-material","verified":"2026-11-08取得正文与示例，确认HdsNavigation/HdsTabs、systemMaterialEffect、自适应材质和GRADIENT_BLUR示例。"},
+    {"id":"S3","title":"华为：智感握姿设计指南","url":"https://developer.huawei.com/consumer/cn/doc/design-guides/smart-reachability-0000002556657823","verified":"本轮未取得有效正文；不据此声称网页的底栏迁移、辅助频道条或弹簧参数是官方要求。"}
+  ],
+  "features": [
+    {"id":"F01","name":"沉浸式系统材质","status":"网页模拟，未接入","implementation":"backdrop-filter、透明背景、CSS自定义变量；没有折射、系统自动反色或uiMaterial调用。","code":"os7.css；os7-top.css；os7-refinement.css","source":"S1","decision":"保留网页模糊；撤下已适配原生材质的表述。ULTRA_THIN等仅用于研究映射；同名CSS变量不是枚举调用，REGULAR变量未实际消费。"},
+    {"id":"F02","name":"导航渐变模糊与滚动联动","status":"网页模拟，未接入","implementation":"滚动监听、CSS遮罩、统一顶部背景与吸顶筛选。","code":"os7.js / syncFilterChrome、updateSurface；os7-refinement.css","source":"S2","decision":"参考HDS导航的滚动背景方向，未实例化HdsNavigation，也没有调用ScrollEffectType.GRADIENT_BLUR。"},
+    {"id":"F03","name":"系统空间动效：形变、流光、粒子","status":"未实现","implementation":"菜单与弹层仅有普通CSS位移、透明度及自定义拖拽。","code":"os7.js / dismissOverlay、enableSheetDrag；os7-refinement.css","source":"S1","decision":"不计为原生空间动效。清除未使用的自绘扫光样式和关键帧；未调用ArkUI Particle或Slider的系统粒子效果。"},
+    {"id":"F04","name":"弹簧、频道滑动与拖拽回弹","status":"通用网页交互","implementation":"requestAnimationFrame与HimaSpring积分；默认stiffness=520、damping=42。","code":"os7-motion.js；os7.js / makeSpring","source":"无专属系统能力声明","decision":"参数为项目自定，不称为鸿蒙原生参数，也不把通用交互计为OS7专属特性。"},
+    {"id":"F05","name":"深浅色与跟随系统","status":"浏览器能力","implementation":"prefers-color-scheme媒体查询与自定义颜色变量。","code":"os7.js / systemTheme、applyPreferences；os7-refinement.css","source":"非鸿蒙专属","decision":"只读取浏览器暴露的偏好，没有调用HarmonyOS主题管理或系统颜色资源。"},
+    {"id":"F06","name":"减少动态效果","status":"浏览器能力","implementation":"prefers-reduced-motion、结束自定义弹簧及压缩CSS过渡。","code":"os7.js / systemMotion、applyPreferences；os7.css","source":"非鸿蒙专属","decision":"保留可访问性功能，不称为原生无障碍接口已接入。"},
+    {"id":"F07","name":"智感握姿","status":"已撤下无依据演示","implementation":"此前是手动选择左右手并水平移动底栏，未读取传感器。","code":"os7.html、os7.js、os7.css 的旧grip分支已移除","source":"S3","decision":"移除握姿开关、自绘辅助频道条及底栏迁移。旧URL的grip参数被忽略并移除；待原生方案与证据齐备后另行设计。"},
+    {"id":"F08","name":"设备算力与材质等级自适应","status":"未接入","implementation":"仅有CSS @supports不支持背景滤镜时的实体降级，透明度开关由用户手动选择。","code":"os7.css；os7-refinement.css","source":"S1、S2","decision":"手动透明度不等于系统强/均衡/弱档，不读取uiMaterial.getGlobalMaterialLevel或hdsMaterial.getSystemMaterialTypes。"},
+    {"id":"F09","name":"鸿蒙黑体与系统语义资源","status":"未接入","implementation":"font-family仅列出HarmonyOS Sans候选并回退系统字体；颜色与间距是项目CSS值。","code":"reference.css；os7.css；os7-refinement.css","source":"代码核验","decision":"没有随包字体、@font-face或系统$r资源调用；不能声称所有设备实际使用鸿蒙黑体、官方Token或已达官方对比度标准。"},
+    {"id":"F10","name":"MiniBar与多设备原生适配","status":"未实现","implementation":"固定392×826.667画布缩放与网页媒体查询。","code":"reference.js；reference.css；os7-refinement.css","source":"代码核验","decision":"未实现持续任务MiniBar、折叠态监听、原生安全区或多设备系统导航；手机比例展示不能当作这些能力的验收。"}
+  ],
+  "components": [
+    {"id":"C01","name":"状态栏与顶部导航","actual":"HTML header、固定时间文本、截图状态图标和CSS背景。","code":"reference.js / status、createPage；os7.js / syncFilterChrome","nativeTarget":"HdsNavigation或Navigation/NavDestination（未来选型，当前未接入）","source":"S1、S2"},
+    {"id":"C02","name":"底部一级导航","actual":"HTML nav/button、自绘SVG和CSS悬浮背景。","code":"reference.js / navIcon；os7.js；os7.css","nativeTarget":"HdsTabs（未来选型，当前未接入）","source":"S2"},
+    {"id":"C03","name":"顶部频道与车型筛选","actual":"HTML按钮、ARIA tab、横向滚动、CSS选中态及JS吸顶。","code":"reference.js / brands、setupChannels；os7.js / syncFilterChrome","nativeTarget":"未选型；通用导航和业务筛选，不是鸿蒙专属组件","source":"代码核验"},
+    {"id":"C04","name":"卡片、列表、宫格、分类分栏","actual":"HTML article/div、CSS grid/flex与overflow滚动。","code":"reference.js / feed、shop、openCategory；os7-media.js","nativeTarget":"业务结构，尚未实施原生组件选型","source":"代码核验"},
+    {"id":"C05","name":"搜索与搜索结果","actual":"HTML form/input/button；精选为独立网页路由，发现为自定义面板。","code":"os7-routes.js / openSearch、results；os7.js / openSearch","nativeTarget":"未接入原生搜索组件；不能因外形相似计为已使用","source":"代码核验"},
+    {"id":"C06","name":"详情、返回与路由栈","actual":"HTML section与浏览器history、popstate、inert。","code":"os7-routes.js / route、popTo、refresh","nativeTarget":"Navigation/NavDestination（未来选型，当前未接入）","source":"S1"},
+    {"id":"C07","name":"半模态：规格、搜索、车型排序","actual":"DOM遮罩、role=dialog、CSS定位、自定义拖拽；不同面板未统一具备同等拖拽行为。","code":"os7-routes.js / openSpec；os7.js / componentSheet、openSort、enableSheetDrag","nativeTarget":"ArkUI半模态转场（未来选型，当前未接入）","source":"S1"},
+    {"id":"C08","name":"发布菜单","actual":"HTML自定义菜单与按钮，CSS入场。","code":"os7.js / openTopAction；os7-refinement.css","nativeTarget":"ArkUI菜单控制（未来选型，当前未接入）","source":"S1"},
+    {"id":"C09","name":"对话层与Toast","actual":"DOM section/div、遮罩和role=status；没有native弹窗调用。","code":"reference.js / showDownload、showToast；os7-top.css","nativeTarget":"AlertDialog/CustomDialog/PromptAction为官方可用路径，当前未选型接入","source":"S1"},
+    {"id":"C10","name":"按钮、开关、文本与图标","actual":"HTML button/input、ARIA状态、系统回退字体、SVG与截图资源。","code":"os7.html；reference.js；os7-routes.js","nativeTarget":"未使用ArkUI Button/Toggle/Text/SymbolGlyph；普通网页控件不能计入","source":"代码核验"},
+    {"id":"C11","name":"商品图集与文章图片","actual":"HTML img与横向overflow、scroll-snap。","code":"os7-routes.js / product、article；os7-routes.css","nativeTarget":"业务内容展示，尚未实施原生组件选型","source":"代码核验"},
+    {"id":"C12","name":"消息、扫码、评论与交易状态","actual":"本地演示消息、模拟识别、评论草稿与购买演示边界。","code":"os7.js / openTopAction；os7-routes.js / article、openSpec","nativeTarget":"没有接入Push Kit、Scan Kit、真实发布或支付服务","source":"代码核验"}
+  ]
+}

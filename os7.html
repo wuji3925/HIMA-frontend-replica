@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#eef1f5">
-    <title>鸿蒙智行 · HarmonyOS 7 适配预览</title>
+    <title>鸿蒙智行 · HarmonyOS 7 设计网页预览</title>
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="./reference.css">
-    <link rel="stylesheet" href="./os7.css">
-    <link rel="stylesheet" href="./os7-top.css?v=20261103-chrome">
+    <link rel="stylesheet" href="./os7.css?v=20261108-audit">
+    <link rel="stylesheet" href="./os7-top.css?v=20261108-audit">
     <link rel="stylesheet" href="./os7-refinement.css?v=20261103-chrome2">
     <link rel="stylesheet" href="./os7-routes.css?v=20261103-images">
   </head>
-  <body class="os7-preview" data-theme="light" data-light="balanced" data-grip="both" data-motion="full">
+  <body class="os7-preview" data-theme="light" data-light="balanced" data-motion="full">
     <main class="demo-shell">
       <aside class="demo-guide" aria-label="适配预览设置">
         <div class="preview-heading"><p class="eyebrow">HIMA · HARMONYOS 7</p><a id="referenceLink" href="./index.html">查看原版 ↗</a></div>
@@ -20,19 +20,18 @@
         <p class="guide-copy">上滑发现页，打开车型栏右侧的排序面板，拖动车型调整顺序；切换精选，体验频道与顶部工具。</p>
         <div class="preview-controls">
           <fieldset><legend>外观</legend><div class="option-group" data-setting="theme"><button data-value="light" aria-pressed="true">浅色</button><button data-value="dark" aria-pressed="false">深色</button><button data-value="auto" aria-pressed="false">跟随系统</button></div></fieldset>
-          <fieldset><legend>光感预览</legend><div class="option-group" data-setting="light"><button data-value="strong" aria-pressed="false">强</button><button data-value="balanced" aria-pressed="true">均衡</button><button data-value="weak" aria-pressed="false">弱</button><button data-value="off" aria-pressed="false">关闭</button></div></fieldset>
-          <fieldset><legend>握姿预览 <small>手动模拟</small></legend><div class="option-group" data-setting="grip"><button data-value="left" aria-pressed="false">左手</button><button data-value="both" aria-pressed="true">双手</button><button data-value="right" aria-pressed="false">右手</button></div></fieldset>
+          <fieldset><legend>网页背景 <small>自定义透明度</small></legend><div class="option-group" data-setting="light"><button data-value="strong" aria-pressed="false">高透明</button><button data-value="balanced" aria-pressed="true">标准</button><button data-value="weak" aria-pressed="false">低透明</button><button data-value="off" aria-pressed="false">实体</button></div></fieldset>
           <label class="motion-option"><span>减少动态效果</span><input id="reduceMotion" type="checkbox" role="switch"></label>
         </div>
         <div class="current-state" aria-live="polite"><span>当前页面</span><strong id="pageTitle">发现 · 推荐</strong><small id="pageStep">频道 1 / 4</small></div>
         <div class="guide-actions"><button id="previousButton">上一频道</button><button id="nextButton">下一频道</button></div>
         <details class="feature-coverage">
-          <summary>OS7 特性覆盖 <span>8 类</span></summary>
+          <summary>实现与依据 <span>原生接入 0</span></summary>
           <ul>
-            <li>语义色彩与组件间距</li><li>按组件分配材质角色</li><li>连续滚动联动标题区</li><li>可中断的频道滑动</li><li>跟手拖拽与释放回弹</li><li>稳定的任务状态反馈</li><li>智感握姿手动模拟</li><li>深色与减少动态降级</li>
+            <li>背景模糊、渐隐：CSS 模拟</li><li>频道、弹层：自定义网页交互</li><li>深色、减少动态：浏览器偏好</li><li>系统材质、握姿识别：未接入</li><li><a href="./capabilities.html" target="_blank" rel="noopener">查看特性、组件与官方依据清单 ↗</a></li>
           </ul>
         </details>
-        <p class="preview-note">网页交互预览。材质、空间动效与握姿识别的原生表现需在 HarmonyOS 真机验证。<a href="./HARMONYOS_7_DESIGN_LANGUAGE.md" target="_blank" rel="noopener">设计语言 ↗</a><a href="./OS7_ADAPTATION.md" target="_blank" rel="noopener">适配说明 ↗</a></p>
+        <p class="preview-note">本页以 HTML/CSS/JavaScript 实现，参考鸿蒙设计方向；未使用 ArkUI/HDS 原生组件。<a href="./capabilities.html" target="_blank" rel="noopener">实现清单 ↗</a><a href="./OS7_ADAPTATION.md" target="_blank" rel="noopener">适配说明 ↗</a></p>
       </aside>
       <section class="phone-stage" aria-label="HarmonyOS 7 手机预览">
         <div id="phone" class="phone" tabindex="0"><div id="screen" class="screen"></div><div id="toast" class="toast" role="status"></div></div>
@@ -41,7 +40,7 @@
     <script src="./reference.js?v=20261103-chrome"></script>
     <script src="./os7-motion.js?v=20261102"></script>
     <script src="./os7-media.js?v=20261103-images"></script>
-    <script src="./os7.js?v=20261103-chrome3"></script>
+    <script src="./os7.js?v=20261108-audit"></script>
     <script src="./os7-routes.js?v=20261103-images"></script>
   </body>
 </html>

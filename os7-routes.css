@@ -1,4 +1,4 @@
-.has-route .bottom-nav,.has-route .reach-toolbar{visibility:hidden}
+.has-route .bottom-nav{visibility:hidden}
 .replica-route{position:absolute;inset:0;z-index:80;background:var(--os-card);color:var(--font-primary);overflow:hidden;animation:route-enter 240ms cubic-bezier(.2,.8,.2,1)}
 .replica-route[hidden]{display:none}
 @keyframes route-enter{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}
