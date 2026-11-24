@@ -2,7 +2,7 @@
 .replica-route{position:absolute;inset:0;z-index:80;background:var(--os-card);color:var(--font-primary);overflow:hidden;animation:route-enter 240ms cubic-bezier(.2,.8,.2,1)}
 .replica-route[hidden]{display:none}
 @keyframes route-enter{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}
-.replica-route-header{position:absolute;inset:0 0 auto;z-index:3;height:98px;background:color-mix(in srgb,var(--os-card) 90%,transparent);backdrop-filter:blur(20px)}
+.replica-route-header{position:absolute;inset:0 0 auto;z-index:3;height:98px;background:color-mix(in srgb,var(--os-card) var(--chrome-tint),transparent);-webkit-backdrop-filter:blur(var(--chrome-blur));backdrop-filter:blur(var(--chrome-blur))}
 .replica-route-bar{height:60px;display:flex;align-items:center;gap:12px;padding:0 16px}
 .replica-route-bar>button{width:28px;height:44px;display:grid;place-items:center;flex:none;color:inherit}
 .replica-route-bar svg{width:24px;height:24px}
@@ -25,7 +25,7 @@
 .replica-product-body+.replica-purchase{position:absolute;inset:auto 0 0;height:84px;display:flex;align-items:center;justify-content:center;padding:12px 16px 20px;background:var(--os-card);z-index:4}
 .replica-purchase button,.replica-buy-confirm{height:42px;border-radius:28px;background:var(--os-brand);color:#fff;font-size:18px;width:196px}
 .replica-route:has(.replica-product-body) .replica-route-header{background:transparent;backdrop-filter:none;pointer-events:none}.replica-route:has(.replica-product-body) .replica-route-bar>button{pointer-events:auto;width:34px;height:34px;border-radius:50%;background:#0003;color:#fff}
-.replica-route.route-scrolled .replica-route-header{background:color-mix(in srgb,var(--os-card) 90%,transparent);backdrop-filter:blur(20px)}
+.replica-route.route-scrolled .replica-route-header{background:color-mix(in srgb,var(--os-card) var(--chrome-tint),transparent);-webkit-backdrop-filter:blur(var(--chrome-blur));backdrop-filter:blur(var(--chrome-blur))}
 .replica-route.route-scrolled .replica-product-nav{display:block!important;font-size:18px}.replica-route.route-scrolled .replica-route-bar>button{color:var(--font-primary);background:transparent}
 .replica-gallery{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;touch-action:pan-x pan-y}
 .replica-gallery img{width:100%;aspect-ratio:1;object-fit:contain;background:var(--os-card);flex:none;scroll-snap-align:center}
@@ -41,7 +41,7 @@
 .replica-spec-heading{display:flex;gap:8px;padding-right:24px;min-height:76px}.replica-spec-heading img{width:75px;height:75px;object-fit:cover;border-radius:8px}.replica-spec-heading strong{font-size:23px;line-height:30px;color:var(--os-brand)}.replica-spec-heading p{font-size:14px;line-height:22px;margin-top:8px}
 .replica-selected{margin:16px 0;width:100%;padding:14px 12px;background:var(--os-bg);border-radius:10px;color:var(--font-secondary);font-size:14px}.replica-spec h2{font-size:16px;font-weight:400;color:var(--font-secondary);margin:0 0 12px}.replica-sku{border-radius:20px;background:color-mix(in srgb,var(--os-brand) 20%,var(--os-card));color:inherit;padding:7px 10px;font-size:14px}.replica-demo-car{margin-top:18px;padding:12px;background:var(--os-bg);border-radius:10px;width:100%;font-size:14px}.replica-demo-car span{float:right;color:var(--font-secondary);font-size:12px}.replica-purchase-note{font-size:12px;color:var(--font-secondary);margin:8px 0}.replica-buy-confirm{margin:auto auto 0;flex:none}
 [data-motion="reduce"] .replica-route,[data-motion="reduce"] .replica-spec{animation:none}
-[data-light="off"] .replica-route-header,[data-light="off"] .replica-route.route-scrolled .replica-route-header{backdrop-filter:none;background:var(--os-card)}
+[data-light="off"] .replica-route-header,[data-light="off"] .replica-route.route-scrolled .replica-route-header{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--os-card)}
 .os7-preview .category-results .products{display:block}
 .os7-preview .category-results h2{display:none}
 .os7-preview .category-results .product{display:grid;grid-template-columns:82px minmax(0,1fr);grid-template-rows:minmax(40px,auto) 24px;gap:4px 10px;margin-bottom:24px;min-height:84px}
@@ -61,3 +61,7 @@
 [data-theme="dark"] .replica-route .system-network{filter:url(#os7-status-ink) invert(1)}
 .replica-route:has(.replica-product-body):not(.route-scrolled) .status-bar{color:#17191c}
 .replica-route:has(.replica-product-body):not(.route-scrolled) .system-network{filter:url(#os7-status-ink)}
+
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
+  .replica-route-header,.replica-route.route-scrolled .replica-route-header {background:var(--os-card)}
+}

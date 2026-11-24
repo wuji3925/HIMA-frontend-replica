@@ -4,25 +4,37 @@
   --os-ink:#17191c; --os-muted:#6b6e75; --os-bg:#f5f5f5;
   --os-line:rgb(0 0 0 / 7%); --os-brand:#0a59f7;
   --material-shadow:0 4px 18px rgb(0 0 0 / 9%);
-  --material-thin:rgb(250 250 250 / 76%);
+  /* Local browser tuning for overlapping navigation surfaces. */
+  --chrome-tint:36%;
+  --chrome-blur:14px;
+  --tab-tint:46%;
+  --tab-blur:14px;
   --material-ultra-thick:rgb(250 250 250 / 94%);
   --edge:rgb(255 255 255 / 60%);
 }
 .os7-preview[data-theme="dark"] {
   --os-ink:#f1f1f1; --os-muted:#b4b4b8; --os-bg:#141416;
   --os-line:rgb(255 255 255 / 10%); --os-brand:#82aeff;
-  --material-thin:rgb(36 36 39 / 82%);
+  --chrome-tint:42%;
+  --tab-tint:52%;
   --material-ultra-thick:rgb(36 36 39 / 96%);
   --edge:rgb(255 255 255 / 12%);
 }
-.os7-preview[data-light="strong"] {--material-thin:rgb(250 250 250 / 62%)}
-.os7-preview[data-theme="dark"][data-light="strong"] {--material-thin:rgb(36 36 39 / 68%)}
-.os7-preview[data-light="weak"] {--material-thin:var(--os-card);--material-ultra-thick:var(--os-card)}
-.os7-preview[data-light="off"] {--material-thin:var(--os-card);--material-ultra-thick:var(--os-card)}
+.os7-preview[data-light="strong"] {--chrome-tint:22%;--tab-tint:32%;--chrome-blur:10px;--tab-blur:10px}
+.os7-preview[data-light="weak"] {--chrome-tint:72%;--tab-tint:78%;--chrome-blur:18px;--tab-blur:18px;--material-ultra-thick:var(--os-card)}
+.os7-preview[data-light="off"] {--chrome-tint:100%;--tab-tint:100%;--tab-blur:0px;--material-ultra-thick:var(--os-card)}
 
 /* APK navigation silhouettes retain their two-tone shape but use the intended
    active/inactive semantic colors, rather than legacy raster-era variables. */
-.os7-preview .bottom-nav {box-shadow:var(--material-shadow);backdrop-filter:blur(26px) saturate(1.02);-webkit-backdrop-filter:blur(26px) saturate(1.02)}
+.os7-preview .bottom-nav {
+  background:color-mix(in srgb,var(--os-card) var(--tab-tint),transparent);
+  box-shadow:var(--material-shadow);
+  -webkit-backdrop-filter:blur(var(--tab-blur));
+  backdrop-filter:blur(var(--tab-blur));
+}
+.os7-preview .bottom-nav button,.os7-preview .app-header .channel-tab {
+  text-shadow:0 0 3px var(--os-card);
+}
 .os7-preview .bottom-nav button {
   --nav-primary:#242528;--nav-secondary:#919297;--nav-cutout:#f5f5f5;
   padding-top:9px;gap:3px;color:var(--font-primary);
@@ -31,16 +43,16 @@
 .os7-preview[data-theme="dark"] .bottom-nav button {--nav-primary:#efeff2;--nav-secondary:#909095;--nav-cutout:#242427}
 .os7-preview[data-theme="dark"] .bottom-nav button.active {--nav-primary:var(--os-brand);--nav-secondary:#5375b0}
 .os7-preview .bottom-nav button:active {transform:scale(.96);background:transparent}
-.os7-preview .screen:after {height:88px;background:linear-gradient(transparent,var(--os-bg))}
+.os7-preview .screen:after {height:calc(var(--demo-safe-bottom) + 16px);background:linear-gradient(transparent,color-mix(in srgb,var(--os-bg) 46%,transparent))}
 
 /* Header tint follows actual overlap. A neutral material sits below readable
    foregrounds; no per-button bevels on top of the same material. */
 .os7-preview .main-page,.os7-preview .category-page {--os7-scroll:0;--os7-hero:1;--chrome-height:98px}
 .os7-preview .top-backdrop {
   height:calc(var(--chrome-height) + 24px);
-  background:color-mix(in srgb,var(--os-card) calc(58% + var(--os7-scroll)*22%),transparent);
-  backdrop-filter:blur(var(--header-blur)) saturate(1.02);
-  -webkit-backdrop-filter:blur(var(--header-blur)) saturate(1.02);
+  background:color-mix(in srgb,var(--os-card) calc(var(--chrome-tint) * var(--os7-scroll)),transparent);
+  backdrop-filter:blur(calc(var(--chrome-blur) * var(--os7-scroll)));
+  -webkit-backdrop-filter:blur(calc(var(--chrome-blur) * var(--os7-scroll)));
   mask-image:linear-gradient(#000 0 calc(100% - 34px),rgb(0 0 0 / 88%) calc(100% - 22px),transparent);
   -webkit-mask-image:linear-gradient(#000 0 calc(100% - 34px),rgb(0 0 0 / 88%) calc(100% - 22px),transparent);
   box-shadow:none!important;filter:none!important;transition:none;
@@ -74,10 +86,6 @@
 .os7-preview[data-theme] .select-page .header-tools .icon-button {color:var(--chrome-ink)}
 .os7-preview .select-page .status-bar .system-network {filter:url(#os7-status-ink)}
 .os7-preview[data-theme="dark"] .select-page .status-bar .system-network {filter:url(#os7-status-ink) invert(1)}
-.os7-preview .select-page>.top-backdrop,
-.os7-preview .select-page.light-header>.top-backdrop {
-  background:color-mix(in srgb,var(--os-card) calc(76% + var(--os7-scroll)*10%),transparent);
-}
 .os7-preview .select-page .tab-panel>.scroll-content {padding-top:142px}
 .os7-preview .select-page.shop-overlay [data-panel="0"]>.scroll-content {padding-top:0}
 .os7-preview .select-page .shop-banner {padding-top:142px;background:var(--os-bg)}
@@ -112,8 +120,6 @@
 .os7-preview .os7-code-preview.scan-complete>svg {color:var(--os-brand)}
 .os7-preview .os7-code-preview.scan-complete {background:color-mix(in srgb,var(--os-brand) 5%,var(--os-card))}
 
-.os7-preview[data-light="weak"] .top-backdrop {background:color-mix(in srgb,var(--os-card) 94%,transparent)}
-.os7-preview[data-light="weak"] .select-page>.top-backdrop {background:color-mix(in srgb,var(--os-card) 96%,transparent)}
 .os7-preview[data-light="off"] .bottom-nav {backdrop-filter:none;-webkit-backdrop-filter:none}
 .os7-preview[data-light="off"] .top-backdrop {height:var(--chrome-height);background:var(--os-card);backdrop-filter:none;-webkit-backdrop-filter:none;mask-image:none;-webkit-mask-image:none}
 .os7-preview[data-light="off"] .select-page>.top-backdrop {background:var(--os-card)}
