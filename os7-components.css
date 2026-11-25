@@ -34,7 +34,7 @@
 .os7-preview .brand {height:40px;min-width:48px;line-height:38px;border-color:transparent}
 .os7-preview .brand.active {background:var(--os-brand);border-color:transparent;color:#fff}
 .os7-preview[data-theme="dark"] .brand.active {color:#102448;background:var(--os-brand)}
-.os7-preview .search-field,.os7-preview .os7-search-box,.os7-preview .replica-query {
+.os7-preview .os7-search-box,.os7-preview .replica-query {
   min-height:44px;border:0;border-radius:22px;box-shadow:none;
   background:var(--control-fill);color:var(--font-secondary);
 }

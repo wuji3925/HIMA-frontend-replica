@@ -4,7 +4,9 @@
   --top-surface:rgb(242 245 248 / 88%);
   --top-edge:rgb(255 255 255 / 94%);
   --top-shadow:0 2px 7px rgb(28 43 62 / 7%);
-  --search-surface:rgb(240 244 249 / 78%);
+  --search-rgb:216 228 248;
+  --search-tint:40%;
+  --search-edge:rgb(255 255 255 / 72%);
   --top-press:rgb(203 216 237 / 65%);
   --header-tint:rgb(246 249 253 / 64%);
   --header-blur:24px;
@@ -13,15 +15,17 @@
   --top-surface:rgb(61 69 81 / 82%);
   --top-edge:rgb(223 233 255 / 17%);
   --top-shadow:0 2px 8px #00000025;
-  --search-surface:rgb(48 56 69 / 90%);
+  --search-rgb:27 35 49;
+  --search-tint:54%;
+  --search-edge:rgb(223 233 255 / 24%);
   --top-press:rgb(94 116 151 / 70%);
   color-scheme:dark;
   --header-tint:rgb(23 28 36 / 72%);
 }
-.os7-preview[data-light="strong"] {--search-surface:rgb(240 244 249 / 62%)}
-.os7-preview[data-theme="dark"][data-light="strong"] {--search-surface:rgb(48 56 69 / 72%)}
-.os7-preview[data-light="weak"] {--search-surface:rgb(240 244 249 / 96%)}
-.os7-preview[data-theme="dark"][data-light="weak"] {--search-surface:rgb(48 56 69 / 98%)}
+.os7-preview[data-light="strong"] {--search-tint:26%}
+.os7-preview[data-theme="dark"][data-light="strong"] {--search-tint:40%}
+.os7-preview[data-light="weak"] {--search-tint:76%}
+.os7-preview[data-theme="dark"][data-light="weak"] {--search-tint:82%}
 .os7-preview[data-light="strong"] {--header-tint:rgb(246 249 253 / 44%);--header-blur:30px}
 .os7-preview[data-theme="dark"][data-light="strong"] {--header-tint:rgb(23 28 36 / 53%)}
 .os7-preview[data-light="weak"] {--header-tint:rgb(246 249 253 / 92%);--header-blur:12px}
@@ -96,18 +100,17 @@
 .os7-preview[data-theme="dark"] .main-page .header-tools .icon-button:before,
 .os7-preview[data-theme="dark"] .category-title .icon-button[aria-label="搜索"]:before {background:rgb(150 168 195 / 12%);border-color:rgb(220 232 255 / 12%)}
 
-/* Search keeps a lightweight fill. Its scrolling surface and sheet input do not
-   add another blur beneath the continuous header or inside a material sheet. */
+/* The entry pill tints the shared backdrop while its foreground stays opaque. */
 .os7-preview .search-field,
 .os7-preview[data-theme="dark"] .search-field {
-  position:relative;height:44px;border-radius:24px;background:var(--search-surface);
-  border:1px solid var(--top-edge);box-shadow:0 2px 6px #17345106;color:var(--os-muted);
-  backdrop-filter:blur(var(--material-blur));-webkit-backdrop-filter:blur(var(--material-blur));
+  position:relative;height:44px;border-radius:24px;
+  background:rgb(var(--search-rgb) / var(--search-tint));
+  border:1px solid var(--search-edge);box-shadow:0 1px 6px rgb(15 23 42 / 8%);
+  color:var(--font-primary);
   transition:transform 200ms var(--ease),background 180ms;gap:9px;
 }
 .os7-preview .search-field:active {opacity:1;transform:scale(.985)}
-.os7-preview .main-page .search-field {backdrop-filter:none;-webkit-backdrop-filter:none}
-.os7-preview .search-field .search-hint {font-size:13px;letter-spacing:.02em;opacity:.85}
+.os7-preview .search-field .search-hint {font-size:13px;letter-spacing:.02em}
 .os7-preview .os7-search-box:focus-within {outline:2px solid var(--blue);outline-offset:2px}
 
 /* Content filtering stays a standard solid component, not a row of glass. */
@@ -139,7 +142,8 @@
 .os7-preview .os7-code-preview svg {width:72px;height:72px;color:var(--os-ink);stroke-width:1.2}
 .os7-preview .os7-code-preview p {font-size:12px;line-height:1.8}
 .os7-preview .toast {background:var(--thick);color:var(--os-ink);border:1px solid var(--edge);box-shadow:var(--material-shadow);backdrop-filter:blur(var(--material-blur));-webkit-backdrop-filter:blur(var(--material-blur));white-space:normal;text-align:center;max-width:85%;width:max-content}
-.os7-preview[data-light="off"] .search-field,.os7-preview[data-light="off"] .toast {background:var(--os-card);backdrop-filter:none;-webkit-backdrop-filter:none}
+.os7-preview[data-light="off"] .search-field {background:var(--control-fill);border-color:transparent;box-shadow:none}
+.os7-preview[data-light="off"] .toast {background:var(--os-card);backdrop-filter:none;-webkit-backdrop-filter:none}
 .os7-preview[data-light="off"] .header-tools .icon-button:before {background:var(--os-bg);backdrop-filter:none;-webkit-backdrop-filter:none;border-color:var(--os-line)}
 .os7-preview[data-light="off"] .select-page.light-header .header-tools .icon-button:before {background:#eef2f8}
 .os7-preview[data-light="off"] .select-page.light-header .header-tools .icon-button {color:#152031}
@@ -147,7 +151,8 @@
 .os7-preview[data-motion="reduce"] .header-tools .icon-button:active:before,
 .os7-preview[data-motion="reduce"] .search-field:active {transform:none}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
-  .os7-preview .search-field,.os7-preview .toast {background:var(--os-card)}
+  .os7-preview .search-field {background:var(--control-fill);border-color:transparent;box-shadow:none}
+  .os7-preview .toast {background:var(--os-card)}
   .os7-preview .header-tools .icon-button:before {background:var(--os-bg)}
   .os7-preview .select-page.light-header .header-tools .icon-button:before {background:#eef2f8}
   .os7-preview .select-page.light-header .header-tools .icon-button {color:#152031}

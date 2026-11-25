@@ -196,9 +196,7 @@
 }
 .os7-preview .discover-search-tray .search-field {
   position:absolute;inset:auto 16px 16px;margin:0;width:auto;
-  color:var(--font-secondary);
 }
-.os7-preview .discover-search-tray .search-hint {opacity:1}
 .os7-preview:not([data-light="off"]) .discover-page>.top-backdrop {
   background:color-mix(in srgb,var(--os-card) var(--chrome-tint),transparent);
   -webkit-backdrop-filter:blur(var(--chrome-blur));
