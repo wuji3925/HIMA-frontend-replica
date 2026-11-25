@@ -164,7 +164,7 @@
 .os7-preview .filter-anchor {height:0;pointer-events:none;transition-property:none!important;animation:none!important;overflow-anchor:none}
 .os7-preview .discover-page .tab-panel {overflow-anchor:none}
 .os7-preview[data-theme] .discover-page>.brand-filter.is-docked {
-  position:absolute;inset:98px 0 auto;z-index:21;height:58px;
+  position:absolute;inset:calc(98px + var(--search-height,0px)) 0 auto;z-index:21;height:58px;
   background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;touch-action:pan-x;
 }
 .os7-preview .discover-page.has-docked-filter>.top-backdrop {
@@ -177,3 +177,38 @@
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
   .os7-preview .discover-page.has-docked-filter>.top-backdrop {mask-image:none;-webkit-mask-image:none}
 }
+
+/* One live search button serves both discovery feeds. Animate the shared dimension
+   so the docked filter and backdrop follow the same edge throughout a reveal. */
+@property --search-height {
+  syntax:"<length>";
+  inherits:true;
+  initial-value:0px;
+}
+.os7-preview .discover-page {
+  --search-row:67px;
+  transition:--search-height 135ms ease-out;
+}
+.os7-preview .discover-search-space {height:var(--search-row)}
+.os7-preview .discover-search-tray {
+  position:absolute;inset:98px 0 auto;z-index:21;height:var(--search-height);
+  overflow:clip;touch-action:none;
+}
+.os7-preview .discover-search-tray .search-field {
+  position:absolute;inset:auto 16px 16px;margin:0;width:auto;
+  color:var(--font-secondary);
+}
+.os7-preview .discover-search-tray .search-hint {opacity:1}
+.os7-preview:not([data-light="off"]) .discover-page>.top-backdrop {
+  background:color-mix(in srgb,var(--os-card) var(--chrome-tint),transparent);
+  -webkit-backdrop-filter:blur(var(--chrome-blur));
+  backdrop-filter:blur(var(--chrome-blur));
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
+  .os7-preview:not([data-light="off"]) .discover-page>.top-backdrop {background:var(--os-card)}
+}
+
+.os7-preview .discover-page:has([data-panel="0"]:not([inert])) .discover-search-tray {
+  transform:translateY(var(--recommend-pull,0px));
+}
+.os7-preview .discover-page .channel-tab {text-shadow:none}

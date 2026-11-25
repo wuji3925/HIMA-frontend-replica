@@ -119,7 +119,7 @@
   function openSearch() {
     const inShop = state.main === 'select';
     if (inShop && window.HimaRoutes) { if(layer&&!layer.classList.contains('category-page'))closeLayer(); window.HimaRoutes.openSearch(); return; }
-    const sourceChannel = inShop ? state.channel.select : 0;
+    const sourceChannel = inShop ? state.channel.select : state.channel.discover === 1 ? 1 : 0;
     const hint = inShop ? '搜索精选商品、软件服务' : '搜索车型、用车内容';
     const overlay = mountOverlay(`<section class="os7-sheet" role="dialog" aria-modal="true" aria-label="${inShop ? '搜索精选商品' : '搜索鸿蒙智行内容'}"><div class="sheet-handle" aria-hidden="true"></div><header><h2>搜索</h2><button data-close>取消</button></header><label class="os7-search-box">${svg('search')}<input type="search" aria-label="搜索内容" placeholder="${hint}" autocomplete="off"></label><div class="os7-search-results" aria-live="polite"></div></section>`, '搜索');
     const input = overlay.querySelector('input');
@@ -145,7 +145,8 @@
           if (!card) return;
           card.hidden = false;
           const scale = phone.clientWidth / W;
-          const target = panel.scrollTop + (card.getBoundingClientRect().top - panel.getBoundingClientRect().top) / scale - 176;
+          const clearance = inShop ? 176 : 98 + pages.get('discover').os7SearchSpace.offsetHeight + 58 + 8;
+          const target = panel.scrollTop + (card.getBoundingClientRect().top - panel.getBoundingClientRect().top) / scale - clearance;
           panel.scrollTo({ top: target, behavior: body.dataset.motion === 'reduce' ? 'instant' : 'smooth' });
         });
         results.append(button);
@@ -306,15 +307,75 @@
     overlay.querySelector('.vehicle-sort-reset').addEventListener('click',()=>{vehicleOrder=[...defaultVehicleOrder];render();sync();overlay.querySelector('[data-order-status]').textContent='已恢复默认排序';});
     render();sync();enableSheetDrag(overlay.querySelector('.os7-sheet'));overlay.querySelector('[data-close]').focus({preventScroll:true});
   }
+  // Docked controls sit outside the feed. A drag or wheel over them still scrolls the active feed.
+  function forwardDockedScroll(element, getPanel) {
+    let drag;
+    element.addEventListener('wheel',event=>{
+      const panel=getPanel();
+      if(!panel||Math.abs(event.deltaX)>Math.abs(event.deltaY))return;
+      event.preventDefault();
+      panel.scrollTop+=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?panel.clientHeight:1);
+    },{passive:false});
+    element.addEventListener('pointerdown',event=>{
+      const panel=getPanel();
+      drag=null;
+      if(panel&&event.button===0)drag={panel,id:event.pointerId,x:event.clientX,y:event.clientY,scroll:panel.scrollTop};
+    });
+    element.addEventListener('pointermove',event=>{
+      if(!drag||drag.id!==event.pointerId)return;
+      const dx=event.clientX-drag.x,dy=event.clientY-drag.y;
+      if(!drag.axis&&Math.hypot(dx,dy)>6)drag.axis=Math.abs(dy)>Math.abs(dx)?'y':'x';
+      if(drag.axis!=='y')return;
+      event.preventDefault();
+      if(!element.hasPointerCapture(event.pointerId))element.setPointerCapture(event.pointerId);
+      drag.panel.scrollTop=drag.scroll-dy/(phone.getBoundingClientRect().width/W);
+    });
+    element.addEventListener('click',event=>{if(drag?.axis==='y'){event.preventDefault();event.stopImmediatePropagation();drag=null;}},true);
+    element.addEventListener('pointerup',()=>{if(drag?.axis!=='y')drag=null;});
+    element.addEventListener('pointercancel',()=>drag=null);
+  }
+
+  function searchExposure(panel, pinned, height) {
+    const recommend=panel.dataset.panel==='0';
+    const y=Math.max(0,Math.min(panel.scrollTop,panel.scrollHeight-panel.clientHeight));
+    const gesture=panel.searchGesture??={previous:0,start:0,direction:0,show:false,lastMove:0};
+    // Ignore sub-pixel movement. Distances are measured in the unscaled phone canvas.
+    const revealDistance=5, readingDistance=52;
+    const direction=Math.sign(y-gesture.previous);
+    if(direction){
+      const now=performance.now();
+      if(direction!==gesture.direction||now-gesture.lastMove>160){
+        gesture.start=gesture.previous;
+        gesture.direction=direction;
+      }
+      const travel=Math.abs(y-gesture.start);
+      if(travel>=revealDistance){
+        // A short upward nudge with the model tabs pinned also opens search.
+        // Continuing the same upward gesture clears it for readingesture.
+        gesture.show=direction<0||(pinned&&travel<readingDistance);
+      }
+      gesture.previous=y;
+      gesture.lastMove=now;
+    }
+    if(y===0){gesture.show=false;gesture.direction=0;}
+    const initial=recommend?Math.max(0,height-y):0;
+    return gesture.show?height:initial;
+  }
+
   function syncFilterChrome(page,activePanel) {
     if(!page.os7Filters||page.hidden)return;
     const scale=page.getBoundingClientRect().width/W;
     if(!scale)return;
     const headerHeight=page.querySelector('.app-header').offsetHeight;
+    const active=page.os7Filters.find(entry=>entry.panel===activePanel);
+    const pageTop=page.getBoundingClientRect().top;
+    const anchorTop=active?(active.anchor.getBoundingClientRect().top-pageTop)/scale:Infinity;
+    const searchHeight=active?searchExposure(activePanel,anchorTop<=headerHeight+.25,page.os7SearchSpace.offsetHeight):0;
+    page.style.setProperty('--search-height',searchHeight+'px');
+    page.os7SearchTray.inert=searchHeight<35;
     let docked=false;
     for(const {panel,row,anchor} of page.os7Filters){
-      const top=(anchor.getBoundingClientRect().top-page.getBoundingClientRect().top)/scale;
-      const pin=panel===activePanel&&top<=headerHeight+.25;
+      const pin=panel===activePanel&&anchorTop<=headerHeight+searchHeight+.25;
       if(pin){
         docked=true;
         if(!row.classList.contains('is-docked')){
@@ -326,11 +387,27 @@
       }
     }
     page.classList.toggle('has-docked-filter',docked);
-    page.style.setProperty('--chrome-height',(headerHeight+(docked?58:0))+'px');
+    page.style.setProperty('--chrome-height',`calc(${headerHeight+(docked?58:0)}px + var(--search-height))`);
   }
   function bindEnhancements() {
     screen.querySelectorAll('.discover-page').forEach(page=>{
       if(page.dataset.deviceStructure)return;page.dataset.deviceStructure='true';
+      const searchButton=page.querySelector('.discover-promo .search-field');
+      const space=document.createElement('div');
+      space.className='discover-search-space';
+      space.setAttribute('aria-hidden','true');
+      searchButton.replaceWith(space);
+      const tray=document.createElement('div');
+      tray.className='discover-search-tray';
+      tray.append(searchButton);
+      page.querySelector('.app-header').after(tray);
+      page.os7SearchTray=tray;
+      page.os7SearchSpace=space;
+      forwardDockedScroll(tray,()=>page.querySelector('.tab-panel:not([inert])'));
+      const refresh=page.querySelector('[data-panel="0"] .pull-refresh');
+      new ResizeObserver(([entry])=>{
+        page.style.setProperty('--recommend-pull',entry.contentRect.height+'px');
+      }).observe(refresh);
       const posts=page.querySelector('[data-panel="1"] .posts');
       if(posts){const wrapper=document.createElement('div');wrapper.innerHTML=feed();const grid=wrapper.firstElementChild;posts.replaceWith(grid);grid.querySelectorAll('.like').forEach(button=>button.addEventListener('click',()=>{const active=button.getAttribute('aria-pressed')!=='true';button.setAttribute('aria-pressed',String(active));const count=button.querySelector('span');if(count)count.textContent=Number(count.textContent)+(active?1:-1);}));}
       page.os7Filters=[...page.querySelectorAll('.brand-filter')].map(row=>{
@@ -338,23 +415,8 @@
         anchor.className='filter-anchor';anchor.setAttribute('aria-hidden','true');row.before(anchor);row.os7Panel=panel;
         // The real row is lifted above the shared backdrop only while docked.
         // Keeping a spacer preserves content, scroll position and existing handlers.
-        row.addEventListener('wheel',event=>{
-          if(!row.classList.contains('is-docked')||Math.abs(event.deltaX)>Math.abs(event.deltaY))return;
-          event.preventDefault();panel.scrollTop+=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?panel.clientHeight:1);
-        },{passive:false});
-        let drag;
-        row.addEventListener('pointerdown',event=>{if(row.classList.contains('is-docked')&&event.button===0)drag={id:event.pointerId,x:event.clientX,y:event.clientY,scroll:panel.scrollTop};});
-        row.addEventListener('pointermove',event=>{
-          if(!drag||drag.id!==event.pointerId)return;
-          const dx=event.clientX-drag.x,dy=event.clientY-drag.y;
-          if(!drag.axis&&Math.hypot(dx,dy)>8)drag.axis=Math.abs(dy)>Math.abs(dx)?'y':'x';
-          if(drag.axis!=='y')return;
-          event.preventDefault();if(!row.hasPointerCapture(event.pointerId))row.setPointerCapture(event.pointerId);
-          panel.scrollTop=drag.scroll-dy/(page.getBoundingClientRect().width/W);
-        });
-        row.addEventListener('click',event=>{if(drag?.axis==='y'){event.preventDefault();event.stopImmediatePropagation();drag=null;}},true);
-        row.addEventListener('pointerup',()=>{if(drag?.axis!=='y')drag=null;});
-        row.addEventListener('pointercancel',()=>drag=null);
+        forwardDockedScroll(row,()=>row.classList.contains('is-docked') ? panel : null);
+        panel.addEventListener('scrollend',()=>{ if(panel.searchGesture) panel.searchGesture.direction=0; });
         return {panel,row,anchor};
       });
       const campaign=page.querySelector('.collection-content');
