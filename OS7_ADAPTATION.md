@@ -8,6 +8,8 @@
 
 搜索框用细描边和半透明底色呈现边界。网页标准档的胶囊底色不透明度为浅色 40%、深色 54%。推荐和动态沿用顶部已模糊的内容作为背景，滚动图片时胶囊内的底色随之变化，提示文字和图标保持清晰。实体模式使用不透明底色。
 
+广场首屏也显示同一半透明搜索框。向上浏览时收起，轻微向下回滑可唤回，在广场内打开或关闭搜索时保留阅读位置。
+
 ## 2026-11-24 上下导航透明度
 
 华为建议顶部悬浮操作采用 ULTRA_THIN 并结合渐变模糊，底部悬浮页签采用 THIN 并结合渐变颜色蒙层。原生材质由系统按设备和用户偏好渲染。[沉浸光感设计指南](https://developer.huawei.com/consumer/cn/doc/design-guides/immersivelight-0000002612101053) · [标题栏与底部导航开发实践](https://developer.huawei.com/consumer/cn/doc/best-practices/bpta-spatiality-immersive/)

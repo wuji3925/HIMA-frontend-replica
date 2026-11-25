@@ -178,7 +178,7 @@
   .os7-preview .discover-page.has-docked-filter>.top-backdrop {mask-image:none;-webkit-mask-image:none}
 }
 
-/* One live search button serves both discovery feeds. Animate the shared dimension
+/* One live search button serves recommendations, moments and plaza. Animate the shared dimension
    so the docked filter and backdrop follow the same edge throughout a reveal. */
 @property --search-height {
   syntax:"<length>";
@@ -190,6 +190,7 @@
   transition:--search-height 135ms ease-out;
 }
 .os7-preview .discover-search-space {height:var(--search-row)}
+.os7-preview .plaza-content .discover-search-space {height:44px;margin:7px 16px 16px}
 .os7-preview .discover-search-tray {
   position:absolute;inset:98px 0 auto;z-index:21;height:var(--search-height);
   overflow:clip;touch-action:none;
@@ -207,6 +208,9 @@
 }
 
 .os7-preview .discover-page:has([data-panel="0"]:not([inert])) .discover-search-tray {
-  transform:translateY(var(--recommend-pull,0px));
+  transform:translateY(var(--search-pull-0,0px));
+}
+.os7-preview .discover-page:has([data-panel="2"]:not([inert])) .discover-search-tray {
+  transform:translateY(var(--search-pull-2,0px));
 }
 .os7-preview .discover-page .channel-tab {text-shadow:none}

@@ -336,7 +336,7 @@
   }
 
   function searchExposure(panel, pinned, height) {
-    const recommend=panel.dataset.panel==='0';
+    const startsWithSearch=panel.dataset.panel!=='1';
     const y=Math.max(0,Math.min(panel.scrollTop,panel.scrollHeight-panel.clientHeight));
     const gesture=panel.searchGesture??={previous:0,start:0,direction:0,show:false,lastMove:0};
     // Ignore sub-pixel movement. Distances are measured in the unscaled phone canvas.
@@ -351,14 +351,14 @@
       const travel=Math.abs(y-gesture.start);
       if(travel>=revealDistance){
         // A short upward nudge with the model tabs pinned also opens search.
-        // Continuing the same upward gesture clears it for readingesture.
+        // Continuing the same upward gesture clears it for reading.
         gesture.show=direction<0||(pinned&&travel<readingDistance);
       }
       gesture.previous=y;
       gesture.lastMove=now;
     }
     if(y===0){gesture.show=false;gesture.direction=0;}
-    const initial=recommend?Math.max(0,height-y):0;
+    const initial=startsWithSearch?Math.max(0,height-y):0;
     return gesture.show?height:initial;
   }
 
@@ -370,7 +370,8 @@
     const active=page.os7Filters.find(entry=>entry.panel===activePanel);
     const pageTop=page.getBoundingClientRect().top;
     const anchorTop=active?(active.anchor.getBoundingClientRect().top-pageTop)/scale:Infinity;
-    const searchHeight=active?searchExposure(activePanel,anchorTop<=headerHeight+.25,page.os7SearchSpace.offsetHeight):0;
+    const hasSearchTray=active||activePanel.dataset.panel==='2';
+    const searchHeight=hasSearchTray?searchExposure(activePanel,anchorTop<=headerHeight+.25,page.os7SearchSpace.offsetHeight):0;
     page.style.setProperty('--search-height',searchHeight+'px');
     page.os7SearchTray.inert=searchHeight<35;
     let docked=false;
@@ -397,6 +398,7 @@
       space.className='discover-search-space';
       space.setAttribute('aria-hidden','true');
       searchButton.replaceWith(space);
+      page.querySelector('.plaza-content .search-field').replaceWith(space.cloneNode());
       const tray=document.createElement('div');
       tray.className='discover-search-tray';
       tray.append(searchButton);
@@ -404,10 +406,18 @@
       page.os7SearchTray=tray;
       page.os7SearchSpace=space;
       forwardDockedScroll(tray,()=>page.querySelector('.tab-panel:not([inert])'));
-      const refresh=page.querySelector('[data-panel="0"] .pull-refresh');
-      new ResizeObserver(([entry])=>{
-        page.style.setProperty('--recommend-pull',entry.contentRect.height+'px');
-      }).observe(refresh);
+      const refreshObserver=new ResizeObserver(entries=>{
+        for(const entry of entries){
+          const channel=entry.target.closest('.tab-panel').dataset.panel;
+          page.style.setProperty('--search-pull-'+channel,entry.contentRect.height+'px');
+        }
+      });
+      for(const panel of page.querySelectorAll('.tab-panel')){
+        if(panel.dataset.panel==='0'||panel.dataset.panel==='2'){
+          refreshObserver.observe(panel.querySelector('.pull-refresh'));
+        }
+        panel.addEventListener('scrollend',()=>{if(panel.searchGesture)panel.searchGesture.direction=0;});
+      }
       const posts=page.querySelector('[data-panel="1"] .posts');
       if(posts){const wrapper=document.createElement('div');wrapper.innerHTML=feed();const grid=wrapper.firstElementChild;posts.replaceWith(grid);grid.querySelectorAll('.like').forEach(button=>button.addEventListener('click',()=>{const active=button.getAttribute('aria-pressed')!=='true';button.setAttribute('aria-pressed',String(active));const count=button.querySelector('span');if(count)count.textContent=Number(count.textContent)+(active?1:-1);}));}
       page.os7Filters=[...page.querySelectorAll('.brand-filter')].map(row=>{
@@ -416,7 +426,6 @@
         // The real row is lifted above the shared backdrop only while docked.
         // Keeping a spacer preserves content, scroll position and existing handlers.
         forwardDockedScroll(row,()=>row.classList.contains('is-docked') ? panel : null);
-        panel.addEventListener('scrollend',()=>{ if(panel.searchGesture) panel.searchGesture.direction=0; });
         return {panel,row,anchor};
       });
       const campaign=page.querySelector('.collection-content');
