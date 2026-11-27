@@ -243,3 +243,16 @@
   transition-delay:0s,180ms,0s,0s;
 }
 .os7-preview[data-motion="reduce"] .screen>.bottom-nav {transition-delay:0s!important}
+
+/* The two feed channels retract the status, title and docked filters as a unit. */
+.os7-preview .discover-page.full-feed-header.title-retracted {
+  --title-lift:max(var(--feed-leading-gap,0px),calc(var(--chrome-height) + 24px));
+}
+.os7-preview .full-feed-header>.app-header {
+  translate:0 calc(0px - var(--title-lift));
+  clip-path:none;
+}
+.os7-preview .full-feed-header>.app-header>.title-bar {translate:none;clip-path:none}
+.os7-preview .full-feed-header .tab-panel:not([inert])>.scroll-content {
+  translate:0 calc(0px - min(var(--title-lift),var(--feed-leading-gap,0px)));
+}

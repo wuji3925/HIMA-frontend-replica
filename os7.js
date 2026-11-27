@@ -381,17 +381,22 @@
     const scale=page.getBoundingClientRect().width/W;
     if(!scale)return;
     const headerHeight=page.querySelector('.app-header').offsetHeight;
-    const visibleHeader=page.classList.contains('title-retracted')?page.querySelector('.status-bar').offsetHeight:headerHeight;
     const active=page.os7Filters.find(entry=>entry.panel===activePanel);
+    page.classList.toggle('full-feed-header',Boolean(active));
+    const retracted=page.classList.contains('title-retracted');
+    const hideFeedHeader=Boolean(active)&&retracted;
+    const visibleHeader=retracted&&!active?page.querySelector('.status-bar').offsetHeight:headerHeight;
     const pageTop=page.getBoundingClientRect().top;
     const anchorTop=active?(active.anchor.getBoundingClientRect().top-pageTop)/scale:Infinity;
     const hasSearchTray=active||activePanel.dataset.panel==='2';
-    const searchHeight=hasSearchTray?searchExposure(activePanel,anchorTop<=visibleHeader+.25,page.os7SearchSpace.offsetHeight):0;
+    const exposure=hasSearchTray?searchExposure(activePanel,anchorTop<=visibleHeader+.25,page.os7SearchSpace.offsetHeight):0;
+    const searchHeight=hideFeedHeader?0:exposure;
     page.style.setProperty('--search-height',searchHeight+'px');
     page.os7SearchTray.inert=searchHeight<35;
     let docked=false;
     for(const {panel,row,anchor} of page.os7Filters){
       const pin=panel===activePanel&&anchorTop<=visibleHeader+searchHeight+.25;
+      row.inert=hideFeedHeader&&pin;
       if(pin){
         docked=true;
         if(!row.classList.contains('is-docked')){
@@ -401,6 +406,12 @@
       }else if(row.classList.contains('is-docked')){
         row.classList.remove('is-docked');anchor.after(row);anchor.style.height='0px';
       }
+    }
+    if(hideFeedHeader){
+      // Fill the area formerly reserved above the banner or the first feed card.
+      const leadingHeight=activePanel.dataset.panel==='0'?page.os7SearchSpace.offsetHeight:active.row.offsetHeight;
+      const spare=Math.max(0,headerHeight+leadingHeight-activePanel.scrollTop);
+      page.style.setProperty('--feed-leading-gap',spare+'px');
     }
     page.classList.toggle('has-docked-filter',docked);
     page.style.setProperty('--chrome-height',`calc(${headerHeight+(docked?58:0)}px + var(--search-height))`);
