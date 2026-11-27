@@ -9,9 +9,10 @@
     theme: ['light', 'dark', 'auto'],
     light: ['strong', 'balanced', 'weak', 'off'],
     motion: ['full', 'reduce'],
+    navigation: ['fixed', 'title', 'both'],
   };
   const url = new URL(location.href);
-  const preferences = { theme: 'light', light: 'balanced', motion: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduce' : 'full' };
+  const preferences = { navigation: 'fixed', theme: 'light', light: 'balanced', motion: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduce' : 'full' };
   for (const key of Object.keys(preferences)) {
     if (optionValues[key].includes(url.searchParams.get(key))) preferences[key] = url.searchParams.get(key);
   }
@@ -54,6 +55,19 @@
     body.dataset.theme = preferences.theme === 'auto' ? systemTheme.matches ? 'dark' : 'light' : preferences.theme;
     body.dataset.light = preferences.light;
     body.dataset.motion = systemMotion.matches ? 'reduce' : preferences.motion;
+    if (body.dataset.navigation !== preferences.navigation) {
+      body.dataset.navigation = preferences.navigation;
+      for (const page of screen.querySelectorAll('.main-page')) {
+        page.os7Navigation = null;
+        page.classList.remove('title-retracted');
+        page.querySelector('.title-bar').inert = false;
+        if (!page.hidden) {
+          const scroller = activeScroller(page);
+          updateScrollNavigation(page, scroller);
+          syncFilterChrome(page, scroller);
+        }
+      }
+    }
     updateGuide();
     if (reduceMotion()) [...springs].forEach(spring => spring.finish());
     document.querySelectorAll('[data-setting]').forEach(group => {
@@ -367,16 +381,17 @@
     const scale=page.getBoundingClientRect().width/W;
     if(!scale)return;
     const headerHeight=page.querySelector('.app-header').offsetHeight;
+    const visibleHeader=page.classList.contains('title-retracted')?page.querySelector('.status-bar').offsetHeight:headerHeight;
     const active=page.os7Filters.find(entry=>entry.panel===activePanel);
     const pageTop=page.getBoundingClientRect().top;
     const anchorTop=active?(active.anchor.getBoundingClientRect().top-pageTop)/scale:Infinity;
     const hasSearchTray=active||activePanel.dataset.panel==='2';
-    const searchHeight=hasSearchTray?searchExposure(activePanel,anchorTop<=headerHeight+.25,page.os7SearchSpace.offsetHeight):0;
+    const searchHeight=hasSearchTray?searchExposure(activePanel,anchorTop<=visibleHeader+.25,page.os7SearchSpace.offsetHeight):0;
     page.style.setProperty('--search-height',searchHeight+'px');
     page.os7SearchTray.inert=searchHeight<35;
     let docked=false;
     for(const {panel,row,anchor} of page.os7Filters){
-      const pin=panel===activePanel&&anchorTop<=headerHeight+searchHeight+.25;
+      const pin=panel===activePanel&&anchorTop<=visibleHeader+searchHeight+.25;
       if(pin){
         docked=true;
         if(!row.classList.contains('is-docked')){
@@ -389,6 +404,33 @@
     }
     page.classList.toggle('has-docked-filter',docked);
     page.style.setProperty('--chrome-height',`calc(${headerHeight+(docked?58:0)}px + var(--search-height))`);
+  }
+  function updateScrollNavigation(page, scroller) {
+    if (!page.classList.contains('main-page')) return;
+    if (page.hidden) {
+      page.os7Navigation = null;
+      return;
+    }
+    const y = Math.max(0, Math.min(scroller.scrollTop, scroller.scrollHeight - scroller.clientHeight));
+    if (page.os7Navigation?.scroller !== scroller) {
+      page.os7Navigation = { scroller, anchor: y, hidden: false };
+      page.classList.remove('title-retracted');
+      page.querySelector('.title-bar').inert = false;
+    }
+    const navigation = page.os7Navigation;
+    if (preferences.navigation === 'fixed') {
+      navigation.anchor = y;
+      return;
+    }
+    // Track travel from the most recent reversal, including slow trackpad movement.
+    navigation.anchor = navigation.hidden ? Math.max(y, navigation.anchor) : Math.min(y, navigation.anchor);
+    const hide = navigation.hidden ? y > 0 && navigation.anchor - y < 8 : y - navigation.anchor >= 16;
+    if (hide !== navigation.hidden) {
+      navigation.hidden = hide;
+      navigation.anchor = y;
+      page.classList.toggle('title-retracted', hide);
+      page.querySelector('.title-bar').inert = hide;
+    }
   }
   function bindEnhancements() {
     screen.querySelectorAll('.discover-page').forEach(page=>{
@@ -505,6 +547,7 @@
       const t = Math.min(1, y / 120);
       page.style.setProperty('--os7-scroll', String(t * t * (3 - 2 * t)));
       page.classList.toggle('os7-scrolled', y > 8);
+      updateScrollNavigation(page,scroller);
       syncFilterChrome(page,scroller);
     };
     screen.querySelectorAll('.main-page,.category-page').forEach(page => {
